@@ -277,10 +277,8 @@
 		492CD39820BC76D7007157B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 53BLZ9DZN8;
+				DEVELOPMENT_TEAM = BUP56BZHCB;
 				INFOPLIST_FILE = Luminito/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -296,10 +294,8 @@
 		492CD39920BC76D7007157B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 53BLZ9DZN8;
+				DEVELOPMENT_TEAM = BUP56BZHCB;
 				INFOPLIST_FILE = Luminito/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

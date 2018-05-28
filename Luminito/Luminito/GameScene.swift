@@ -13,6 +13,9 @@ class GameScene: SKScene {
     
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
+    var luminito = SKSpriteNode(texture: SKTexture(imageNamed: "Character Idle"))
+    var bigMeteor = SKSpriteNode(texture: SKTexture(imageNamed: "Asteroide Grande"))
+    var smallMeteor = SKSpriteNode(texture: SKTexture(imageNamed: "Asteroide Pequeno"))
     
     override func didMove(to view: SKView) {
         
@@ -35,6 +38,14 @@ class GameScene: SKScene {
                                               SKAction.fadeOut(withDuration: 0.5),
                                               SKAction.removeFromParent()]))
         }
+        
+        
+        luminito.position = CGPoint(x: -(scene?.size.width)!/2.3, y: 0.0)
+        luminito.isUserInteractionEnabled = true
+        self.addChild(luminito)
+        
+        createRandomMeteor()
+        
     }
     
     
@@ -48,9 +59,8 @@ class GameScene: SKScene {
     
     func touchMoved(toPoint pos : CGPoint) {
         if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
+            //Atualizar a posição quando conseguir identificar o swipe para cima e para baixo
+            luminito.position.y += 5
         }
     }
     
@@ -84,6 +94,51 @@ class GameScene: SKScene {
     
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        
+        bigMeteor.position.x -= 10.0
+        smallMeteor.position.x -= 10.0
     }
+    
+    func createRandomMeteor(){
+        
+        var randomNumber = arc4random_uniform(2)
+        
+        if(randomNumber == 1){
+            bigMeteor.position = CGPoint(x: (scene?.size.width)!/2, y: 0.0)
+            self.addChild(bigMeteor)
+        }else{
+            smallMeteor.position = CGPoint(x: (scene?.size.width)!/2, y: 0.0)
+            self.addChild(smallMeteor)
+        }
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
