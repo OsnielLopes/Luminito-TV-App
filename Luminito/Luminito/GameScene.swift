@@ -49,7 +49,6 @@ class GameScene: SKScene {
         
     }
     
-    
     func touchDown(atPoint pos : CGPoint) {
         if let n = self.spinnyNode?.copy() as! SKShapeNode? {
             n.position = pos
@@ -60,8 +59,15 @@ class GameScene: SKScene {
     
     func touchMoved(toPoint pos : CGPoint) {
         if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            //Atualizar a posição quando conseguir identificar o swipe para cima e para baixo
-            luminito.position.y += 5
+            if (pos.y == n.position.y){
+                
+            }
+            else if (pos.y > n.position.y){ 
+                luminito.position.y += 10
+            }else{
+                luminito.position.y -= 10
+            }
+            self.spinnyNode?.position.y = pos.y
         }
     }
     
@@ -93,9 +99,7 @@ class GameScene: SKScene {
         for t in touches { self.touchUp(atPoint: t.location(in: self)) }
     }
     
-    
     override func update(_ currentTime: TimeInterval) {
         
     }
 }
-

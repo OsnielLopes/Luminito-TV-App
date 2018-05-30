@@ -21,8 +21,6 @@ public class Meteor: SKSpriteNode {
         self.meteorspeed = 20
         self.width = gameScene.frame.width
         self.height = gameScene.frame.height
-        print(width)
-        print(height)
         super.init(texture: SKTexture(imageNamed: "Asteroide Grande"), color: UIColor.red, size: CGSize(width: 0, height: 0))
     }
     
