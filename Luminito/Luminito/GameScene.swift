@@ -14,8 +14,7 @@ class GameScene: SKScene {
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
     var luminito = SKSpriteNode(texture: SKTexture(imageNamed: "Character Idle"))
-    var bigMeteor = SKSpriteNode(texture: SKTexture(imageNamed: "Asteroide Grande"))
-    var smallMeteor = SKSpriteNode(texture: SKTexture(imageNamed: "Asteroide Pequeno"))
+    var meteorArray = [Meteor]()
     
     override func didMove(to view: SKView) {
         
@@ -32,19 +31,21 @@ class GameScene: SKScene {
         
         if let spinnyNode = self.spinnyNode {
             spinnyNode.lineWidth = 2.5
-            
+
             spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
             spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
                                               SKAction.fadeOut(withDuration: 0.5),
                                               SKAction.removeFromParent()]))
         }
         
-        
         luminito.position = CGPoint(x: -(scene?.size.width)!/2.3, y: 0.0)
         luminito.isUserInteractionEnabled = true
         self.addChild(luminito)
-        
-        createRandomMeteor()
+
+        let meteor = Meteor.init(gameScene: self)
+        meteor.createRandomMeteor()
+        self.view?.scene?.addChild(meteor)
+        meteor.moveMeteor()
         
     }
     
@@ -95,50 +96,6 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         
-        bigMeteor.position.x -= 10.0
-        smallMeteor.position.x -= 10.0
     }
-    
-    func createRandomMeteor(){
-        
-        var randomNumber = arc4random_uniform(2)
-        
-        if(randomNumber == 1){
-            bigMeteor.position = CGPoint(x: (scene?.size.width)!/2, y: 0.0)
-            self.addChild(bigMeteor)
-        }else{
-            smallMeteor.position = CGPoint(x: (scene?.size.width)!/2, y: 0.0)
-            self.addChild(smallMeteor)
-        }
-        
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
+
