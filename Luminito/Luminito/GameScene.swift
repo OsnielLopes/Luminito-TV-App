@@ -14,27 +14,23 @@ class GameScene: SKScene {
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
     
+    var starsLayer1:[SKShapeNode] = []
+    var starsLayer2:[SKShapeNode] = []
+    var starsLayer3:[SKShapeNode] = []
+    
+    var randomGen = RandomGenerator()
+    var parallaxManager = ParallaxManager()
+    
     override func didMove(to view: SKView) {
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
+        guard let gameView = self.view else {return}
         
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
+        self.parallaxManager.startBackGroundParallax(view: gameView, sprite: "smallStars", duration: 500, zPosition: -3)
+        self.parallaxManager.startBackGroundParallax(view: gameView, sprite: "mediumSmallStars", duration: 250, zPosition: -2)
         
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
+        
+        self.view?.scene?.backgroundColor = UIColor.black
+        
     }
     
     
@@ -63,11 +59,13 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-        }
+//        if let label = self.label {
+//            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+//        }
+//
+//        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+        
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -82,8 +80,34 @@ class GameScene: SKScene {
         for t in touches { self.touchUp(atPoint: t.location(in: self)) }
     }
     
+    var deltaTime = 0.0
+    var deltaTimeTemp = 0.0
+    var deltaTimeTempForNebula = 0.0
+    var lastTime: TimeInterval = 0.0
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        
+        if currentTime < 250000 {
+            deltaTime = currentTime - lastTime
+            lastTime = currentTime
+            deltaTimeTemp += deltaTime
+        }
+        
+        print(deltaTimeTemp)
+        if (deltaTimeTemp >= deltaTimeTempForNebula) {
+            
+            guard let gameView = self.view else {return}
+            self.parallaxManager.startCelestialBody(view: gameView, sprite: "test", width: ((gameView.scene?.size.width)! * 4), height: ((gameView.scene?.size.height)! * 3.4), duration: 60, zPosition: -1)
+                
+            self.deltaTimeTempForNebula = Double(self.randomGen.generateRandomNumber(min: 10, max: 10))
+            
+            deltaTimeTemp = 0
+        }
+        
+        
     }
+    
+    
 }
+
+

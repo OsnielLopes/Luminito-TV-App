@@ -14,6 +14,8 @@
 		492CD38E20BC76D4007157B5 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492CD38D20BC76D4007157B5 /* GameViewController.swift */; };
 		492CD39120BC76D4007157B5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 492CD38F20BC76D4007157B5 /* Main.storyboard */; };
 		492CD39320BC76D7007157B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 492CD39220BC76D7007157B5 /* Assets.xcassets */; };
+		EB84697120BF38EC00D279FA /* ParallaxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB84697020BF38EC00D279FA /* ParallaxManager.swift */; };
+		EBA8EB3820BCFF82009E4939 /* RandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA8EB3720BCFF82009E4939 /* RandomGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		492CD39020BC76D4007157B5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		492CD39220BC76D7007157B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		492CD39420BC76D7007157B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EB84697020BF38EC00D279FA /* ParallaxManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxManager.swift; sourceTree = "<group>"; };
+		EBA8EB3720BCFF82009E4939 /* RandomGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +70,8 @@
 				492CD38F20BC76D4007157B5 /* Main.storyboard */,
 				492CD39220BC76D7007157B5 /* Assets.xcassets */,
 				492CD39420BC76D7007157B5 /* Info.plist */,
+				EBA8EB3720BCFF82009E4939 /* RandomGenerator.swift */,
+				EB84697020BF38EC00D279FA /* ParallaxManager.swift */,
 			);
 			path = Luminito;
 			sourceTree = "<group>";
@@ -142,6 +148,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EB84697120BF38EC00D279FA /* ParallaxManager.swift in Sources */,
+				EBA8EB3820BCFF82009E4939 /* RandomGenerator.swift in Sources */,
 				492CD38C20BC76D4007157B5 /* GameScene.swift in Sources */,
 				492CD38E20BC76D4007157B5 /* GameViewController.swift in Sources */,
 				492CD38620BC76D4007157B5 /* AppDelegate.swift in Sources */,
@@ -280,7 +288,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 53BLZ9DZN8;
+				DEVELOPMENT_TEAM = Q352GCJU8N;
 				INFOPLIST_FILE = Luminito/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -299,7 +307,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 53BLZ9DZN8;
+				DEVELOPMENT_TEAM = Q352GCJU8N;
 				INFOPLIST_FILE = Luminito/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
