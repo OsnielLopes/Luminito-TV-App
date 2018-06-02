@@ -31,9 +31,15 @@ class PowerUpGenerator {
         self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
     }
     
+    func generateIntangibilityPowerUp() {
+        self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleluminitoCategory)!
+        self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
+    }
+    
     //MARK: - Power Up time stop
     @objc func stop() {
         self.gameViewController?.colectible = .none
+        self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.luminitoCategory)!
     }
     
 }

@@ -11,16 +11,20 @@ import SpriteKit
 import GameplayKit
 
 enum Colectible {
-    case velocityBoost, meteorRepellent, meteorDestroyer, magnet, oneMoreLife, intagibility, none
+    case velocityBoost, meteorRepellent, meteorDestroyer, magnet, oneMoreLife, intangibility, none
 }
 
 class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDelegate {
     
+    //MARK: - Luminito
+    var luminito: SKSpriteNode?
+    
     //MARK: - Variables
     var scene: SKScene!
-    var colectible: Colectible = .intagibility
+    var colectible: Colectible = .intangibility
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
+    let intangibleluminitoCategory: UInt32 = 0x1 << 2
     
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
@@ -36,7 +40,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     lazy var distanceLabel: SKLabelNode = {
         var label = SKLabelNode(fontNamed: "Avenir")
         label.fontSize = 36
-        label.color = UIColor.yellow
+        label.fontColor = UIColor.yellow
         label.horizontalAlignmentMode = .right
         label.verticalAlignmentMode = .bottom
         
@@ -75,15 +79,15 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             view.showsNodeCount = true
         
             //adds the luminito node
-            let luminito = SKSpriteNode(imageNamed: "Character Wow")
+            self.luminito = SKSpriteNode(imageNamed: "Character Wow")
             let position = CGPoint(x: self.scene.frame.width*0.1, y: self.scene.frame.height*0.5)
-            luminito.position = position
-            let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: luminito.size)
+            luminito?.position = position
+            let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: (luminito?.size)!)
             luminitoPhysicsBody.categoryBitMask = luminitoCategory
             luminitoPhysicsBody.collisionBitMask = meteorCategory
             luminitoPhysicsBody.isDynamic = false
-            luminito.physicsBody = luminitoPhysicsBody
-            self.scene.addChild(luminito)
+            luminito?.physicsBody = luminitoPhysicsBody
+            self.scene.addChild(luminito!)
             
             addMeteors()
             
@@ -156,15 +160,17 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     @objc func didTap(){
         
-        self.colectible = .velocityBoost
+        self.colectible = .intangibility
         
         switch self.colectible {
-        case .intagibility:
-            print("not allowed yet")
+        case .intangibility:
+            
+            self.powerUpGenerator?.generateIntangibilityPowerUp()
+            print("Intangibility Engaged")
         case .velocityBoost:
             
             self.powerUpGenerator?.generateVelocityBoostPowerUp()
-            print("Velocity Engage")
+            print("Velocity Engaged")
             
         case .meteorRepellent:
             print("not allowed yet")
@@ -189,7 +195,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - Auxiliar Functions
     
     private func addMeteors() {
-        for _ in 0..<3{
+        for _ in 0..<10{
             addMeteor()
         }
     }
