@@ -11,8 +11,6 @@ import SpriteKit
 
 class RandomGenerator {
     
-    var e = false
-    
     func generateRandomStar(view: SKView, minSize: Int, maxSize: Int) {
         
         let randomY = generateRandomNumber(min: Int(-((view.scene?.size.height)! * 0.5)), max: (Int((view.scene?.size.height)! * 0.5)))

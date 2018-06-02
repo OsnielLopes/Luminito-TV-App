@@ -29,6 +29,11 @@ class ParallaxManager {
         view.scene?.addChild(bg1)
         bg1.zPosition = zPosition
         
+        if sprite == "smallStars" {
+            bg.alpha = 0.3
+            bg1.alpha = 0.3
+        }
+        
         let p1 = CGPoint(x: 0, y: 0)
         let p2 = CGPoint(x: -(view.scene?.size.width)!, y: CGFloat(0))
         let p3 = CGPoint(x: (view.scene?.size.width)!, y: CGFloat(0))
@@ -53,6 +58,9 @@ class ParallaxManager {
             bg.run(act)
         }
         
+        
+        
+        
     }
     
     func startCelestialBody(view: SKView, sprite: String, width: CGFloat, height: CGFloat, duration: TimeInterval, zPosition: CGFloat) {
@@ -72,33 +80,38 @@ class ParallaxManager {
         body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
         view.scene?.addChild(body)
         body.zPosition = zPosition
+        self.isNebulaInScreen = true
         
-        body.lightingBitMask = 1
-        body.shadowCastBitMask = 0
-        body.shadowedBitMask = 1
+//        body.lightingBitMask = 1
+//        body.shadowCastBitMask = 0
+//        body.shadowedBitMask = 1
         
         body.alpha = 0
         
-        let action = SKAction.move(to: CGPoint(x:0,y:0), duration: 0)
+        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.2),y:0), duration: duration)
+        let fade = SKAction.fadeAlpha(to: 0.8, duration: 10)
         
         body.run(action) {
-            let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5) - (width * 0.5)), y: CGFloat(0))
+            body.run(fade) {
+                self.isNebulaInScreen = true
+            }
+            
+            let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5)), y: CGFloat(0))
             let action2 = SKAction.move(to: point, duration: duration)
             
-            let fade = SKAction.fadeAlpha(to: 0.8, duration: 10)
+            let point2 = CGPoint(x: -((view.scene?.size.width)! * 1.2), y: 0)
+            let action3 = SKAction.move(to: point2, duration: duration)
             
-            body.run(action2)
-            body.run(fade)
+            let fadeOut = SKAction.fadeAlpha(to: 0, duration: 10)
+            
+            body.run(action2) {
+                
+                body.run(action3)
+                body.run(fadeOut) {
+                  self.isNebulaInScreen = false
+                }
+            }
         }
-        
-        let storm = SKLightNode()
-        storm.categoryBitMask = 1
-        storm.falloff = 0
-        storm.ambientColor = SKColor.white
-        storm.lightColor = SKColor.white
-        storm.shadowColor = SKColor.black
-        storm.position = CGPoint(x: 0, y: 0)
-        view.scene?.addChild(storm)
         
     }
     
