@@ -11,10 +11,10 @@ import SpriteKit
 import GameplayKit
 
 enum Colectible {
-    case velocityBoost, meteorRepellent, meteorDestroyer, magnet, oneMoreLife, intagibility
+    case velocityBoost, meteorRepellent, meteorDestroyer, magnet, oneMoreLife, intagibility, none
 }
 
-class GameViewController: UIViewController, SKSceneDelegate {
+class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDelegate {
     
     //MARK: - Variables
     var scene: SKScene!
@@ -22,9 +22,38 @@ class GameViewController: UIViewController, SKSceneDelegate {
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
     
+    //MARK: - Managers
+    var powerUpGenerator: PowerUpGenerator?
+    
+    //MARK: - Arrays
+    var meteors:[SKMeteorNode] = []
+    var backgrounds:[SKSpriteNode] = []
+    
+    lazy var scoreLabel: SKLabelNode = {
+        var label = SKLabelNode(fontNamed: "Avenir")
+        label.fontSize = 36
+        label.color = UIColor.yellow
+        label.horizontalAlignmentMode = .right
+        label.verticalAlignmentMode = .bottom
+        
+        //Distance between pluto and the Sun: 6 billion km
+        //Light Speed in kilometers: 300.000 km/s, each second decrements 300.000 from the label
+        label.text = "6000000000 km"
+        
+        return label
+    }()
+    
+    var score: Int = 6000000000 {
+        didSet {
+            self.scoreLabel.text = "\(score) km"
+        }
+    }
+    
     //MARK: - View Life Cicle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.powerUpGenerator = PowerUpGenerator(gameViewController: self)
         
         if let view = self.view as! SKView? {
             
@@ -33,13 +62,14 @@ class GameViewController: UIViewController, SKSceneDelegate {
             scene.scaleMode = .aspectFill
             scene.delegate = self
             scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+            scene.physicsWorld.contactDelegate = self
             
             // Present the scene
             view.presentScene(scene)
             view.ignoresSiblingOrder = true
             view.showsFPS = true
             view.showsNodeCount = true
-            
+        
             //adds the luminito node
             let luminito = SKSpriteNode(imageNamed: "Character Wow")
             let position = CGPoint(x: self.scene.frame.width*0.1, y: self.scene.frame.height*0.5)
@@ -53,6 +83,10 @@ class GameViewController: UIViewController, SKSceneDelegate {
             
             addMeteors()
             
+            //add HUD
+            self.scoreLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
+            self.scene.addChild(self.scoreLabel)
+            
             //add the tap recognizer
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
             view.addGestureRecognizer(tapRecognizer)
@@ -64,32 +98,50 @@ class GameViewController: UIViewController, SKSceneDelegate {
         // Release any cached data, images, etc that aren't in use.
     }
     
-    //MARK: - SKSceneDelegate
     
+    //MARK: - SKSceneDelegate
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
             guard let meteor = node as? SKMeteorNode else {
                 print("Impossible to convert the node to a SKMeteorNode")
                 return
             }
+            
+            //If meteor is off the Scene
             if !((self.scene.view?.frame.contains(meteor.position))!) {
+                
+                //Sets meteor new position
                 let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
                 meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+
+            }
+            
+            if self.colectible == .none {
                 meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
-                
             }
         }
+    }
+    
+    //MARK: - ContactDelegate
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        
     }
     
     //MARK: - Gesture Recognition
     
     @objc func didTap(){
         
+        self.colectible = .velocityBoost
+        
         switch self.colectible {
         case .intagibility:
             print("not allowed yet")
         case .velocityBoost:
-            print("not allowed yet")
+            
+            self.powerUpGenerator?.generateVelocityBoostPowerUp()
+            print("Velocity Engage")
+            
         case .meteorRepellent:
             print("not allowed yet")
         case .meteorDestroyer:
@@ -98,6 +150,8 @@ class GameViewController: UIViewController, SKSceneDelegate {
             print("not allowed yet")
         case .oneMoreLife:
             print("not allowed yet")
+        case .none:
+            print("powerUps disabled")
         }
         
         self.scene.enumerateChildNodes(withName: "meteor") { (node, end) in
@@ -111,7 +165,7 @@ class GameViewController: UIViewController, SKSceneDelegate {
     //MARK: - Auxiliar Functions
     
     private func addMeteors() {
-        for _ in 0..<40{
+        for _ in 0..<3{
             addMeteor()
         }
     }
@@ -131,7 +185,7 @@ class GameViewController: UIViewController, SKSceneDelegate {
         meteorPhysicsBody.linearDamping = 0
         meteor.physicsBody = meteorPhysicsBody
         self.scene.addChild(meteor)
-
+        self.meteors.append(meteor)
         //adds the movement
         meteor.physicsBody?.velocity = CGVector(dx: xVelocity, dy: 0)
     

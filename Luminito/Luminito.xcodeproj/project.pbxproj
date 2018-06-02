@@ -15,6 +15,7 @@
 		492CD39320BC76D7007157B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 492CD39220BC76D7007157B5 /* Assets.xcassets */; };
 		49375B5D20BF2CAF002403CD /* SKMeteorNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */; };
 		49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */; };
+		EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		492CD39420BC76D7007157B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorNode.swift; sourceTree = "<group>"; };
 		49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorPhysicsBody.swift; sourceTree = "<group>"; };
+		EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerUpGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				492CD38F20BC76D4007157B5 /* Main.storyboard */,
 				492CD39220BC76D7007157B5 /* Assets.xcassets */,
 				492CD39420BC76D7007157B5 /* Info.plist */,
+				EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */,
 			);
 			path = Luminito;
 			sourceTree = "<group>";
@@ -144,6 +147,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */,
 				492CD38C20BC76D4007157B5 /* GameScene.swift in Sources */,
 				49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */,
 				49375B5D20BF2CAF002403CD /* SKMeteorNode.swift in Sources */,
