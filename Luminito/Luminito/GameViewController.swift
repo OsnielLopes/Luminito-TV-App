@@ -22,6 +22,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
     
+    var deltaTime = 0.0
+    var deltaTimeTemp = 0.0
+    var lastTime: TimeInterval = 0.0
+    
     //MARK: - Managers
     var powerUpGenerator: PowerUpGenerator?
     
@@ -29,7 +33,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var meteors:[SKMeteorNode] = []
     var backgrounds:[SKSpriteNode] = []
     
-    lazy var scoreLabel: SKLabelNode = {
+    lazy var distanceLabel: SKLabelNode = {
         var label = SKLabelNode(fontNamed: "Avenir")
         label.fontSize = 36
         label.color = UIColor.yellow
@@ -43,9 +47,9 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         return label
     }()
     
-    var score: Int = 6000000000 {
+    var distance: Int = 6000000000 {
         didSet {
-            self.scoreLabel.text = "\(score) km"
+            self.distanceLabel.text = "\(distance) km"
         }
     }
     
@@ -84,8 +88,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             addMeteors()
             
             //add HUD
-            self.scoreLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
-            self.scene.addChild(self.scoreLabel)
+            self.distanceLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
+            self.scene.addChild(self.distanceLabel)
             
             //add the tap recognizer
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
@@ -100,7 +104,27 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     
     //MARK: - SKSceneDelegate
+    
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
+
+        if (deltaTimeTemp >= 1.0) {
+            //A second passed, 300.000 km traveled
+            //self.distance -= 300000
+            deltaTimeTemp = 0
+        }
+
+        //Update calls it 60 times per second, so in one second is 5000 * 60 = 300.000 km (1s c)
+        if self.colectible == .velocityBoost {
+            distance -= 15000
+        } else {
+            distance -= 5000
+        }
+        
+        deltaTime = 0.0
+        deltaTime = currentTime - lastTime
+        lastTime = currentTime
+        deltaTimeTemp += deltaTime
+        
         scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
             guard let meteor = node as? SKMeteorNode else {
                 print("Impossible to convert the node to a SKMeteorNode")
