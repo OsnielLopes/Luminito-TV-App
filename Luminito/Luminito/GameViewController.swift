@@ -25,6 +25,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
     let intangibleluminitoCategory: UInt32 = 0x1 << 2
+    var gameover = false
     
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
@@ -70,7 +71,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             scene.scaleMode = .aspectFill
             scene.delegate = self
             scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
-
+            scene.physicsWorld.contactDelegate = self
             
             // Present the scene
             view.presentScene(scene)
@@ -85,6 +86,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: (luminito?.size)!)
             luminitoPhysicsBody.categoryBitMask = luminitoCategory
             luminitoPhysicsBody.collisionBitMask = meteorCategory
+            
             luminitoPhysicsBody.isDynamic = false
             luminito?.physicsBody = luminitoPhysicsBody
             self.scene.addChild(luminito!)
@@ -111,41 +113,43 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
 
-        if (deltaTimeTemp >= 1.0) {
-            //A second passed, 300.000 km traveled
-            //self.distance -= 300000
-            deltaTimeTemp = 0
-        }
-
-        //Update calls it 60 times per second, so in one second is 5000 * 60 = 300.000 km (1s c)
-        if self.colectible == .velocityBoost {
-            distance -= 15000
-        } else {
-            distance -= 5000
-        }
-        
-        deltaTime = 0.0
-        deltaTime = currentTime - lastTime
-        lastTime = currentTime
-        deltaTimeTemp += deltaTime
-        
-        scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
-            guard let meteor = node as? SKMeteorNode else {
-                print("Impossible to convert the node to a SKMeteorNode")
-                return
+        if self.gameover == false {
+            if (deltaTimeTemp >= 1.0) {
+                //A second passed, 300.000 km traveled
+                //self.distance -= 300000
+                deltaTimeTemp = 0
             }
+
+            //Update calls it 60 times per second, so in one second is 5000 * 60 = 300.000  km (1s c)
+            if self.colectible == .velocityBoost {
+                distance -= 15000
+            } else {
+                distance -= 5000
+            }
+        
+            deltaTime = 0.0
+            deltaTime = currentTime - lastTime
+            lastTime = currentTime
+            deltaTimeTemp += deltaTime
+
+                scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
+                guard let meteor = node as? SKMeteorNode else {
+                    print("Impossible to convert the node to a SKMeteorNode")
+                    return
+                }
             
-            //If meteor is off the Scene
-            if !((self.scene.view?.frame.contains(meteor.position))!) {
+                //If meteor is off the Scene
+                if !((self.scene.view?.frame.contains(meteor.position))!) {
                 
-                //Sets meteor new position
-                let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-                meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
-
-            }
+                    //Sets meteor new position
+                    let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+                    meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+                }
             
-            if self.colectible == .none {
-                meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
+                if self.colectible == .none {
+                    meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
+                }
+            
             }
         }
     }
@@ -154,16 +158,39 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     func didBegin(_ contact: SKPhysicsContact) {
         
+        //Luminito
         let whoTouch = contact.bodyA
+        
+        //Meteor, PowerUps, Coins
         let wasTouched = contact.bodyB
         
-        if whoTouch.categoryBitMask == meteorCategory {
-            //Meteor touched something
+        if wasTouched.categoryBitMask == meteorCategory {
+            //Something touched meteor
             
-            switch wasTouched.categoryBitMask {
+            switch whoTouch.categoryBitMask {
             case luminitoCategory:
+                //Luminito touched meteor and dies tragically
                 
-                wasTouched.node?.position = CGPoint(x: 0, y: 0)
+                self.gameover = true
+                
+                for meteor in self.meteors {
+                    meteor.physicsBody = nil
+                }
+                
+                whoTouch.categoryBitMask = intangibleluminitoCategory
+                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
+                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
+                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
+                
+                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
+                
+                let seq = [a1,a2,a3]
+                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
+                    
+                    whoTouch.node?.run(a4, completion: {
+                        self.gameOver()
+                    })
+                })
                 
                 break
             default:
@@ -173,6 +200,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         }
         
     }
+    
     
     //MARK: - Gesture Recognition
     
@@ -228,6 +256,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         let meteorPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Asteroide Pequeno"), size: meteor.size)
         meteorPhysicsBody.categoryBitMask = meteorCategory
         meteorPhysicsBody.collisionBitMask = luminitoCategory | meteorCategory
+        meteorPhysicsBody.contactTestBitMask = luminitoCategory
+        
         meteorPhysicsBody.isDynamic = true
         meteorPhysicsBody.restitution = 1
         meteorPhysicsBody.linearDamping = 0
@@ -244,6 +274,81 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
 //            meteor.removeFromParent()
 //            self.addMeteor()
 //        }
+    }
+    
+    func gameOver(){
+        //FIXME: - Low FPS when put Blur effect
+        
+        //                let  blur = CIFilter(name:"CIGaussianBlur",withInputParameters: ["inputRadius": 10.0])
+        //                self.scene.filter = blur
+        //                self.scene.shouldRasterize = true
+        //                self.scene.shouldEnableEffects = true
+        
+        
+        // Create an effects node with blur
+//        let effectsNode = SKEffectNode()
+//        let filter = CIFilter(name: "CIGaussianBlur")
+//        // Set the blur amount. Adjust this to achieve the desired effect
+//        let blurAmount = 10.0
+//        filter?.setValue(blurAmount, forKey: kCIInputRadiusKey)
+//
+//        effectsNode.filter = filter
+//        effectsNode.position = CGPoint(x: 0, y: 0)
+//        effectsNode.blendMode = .alpha
+        
+        // Add the sprite to effects node to the sprite be blurred
+//        let nodes = self.scene.children
+//        self.scene.removeAllChildren()
+//        for node in nodes {
+//            self.gameover = true
+//            node.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+//            node.physicsBody = nil
+//            effectsNode.addChild(node)
+//        }
+//        self.scene.addChild(effectsNode)
+        
+        //Not blurred
+        
+        //Luminito Sad
+        let sprite = SKSpriteNode(imageNamed: "Character Sad")
+        sprite.position = CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 1.5)
+        sprite.size = CGSize(width: self.scene.size.width * 0.3 , height: self.scene.size.width * 0.3);
+        sprite.zPosition = 100
+        self.scene.addChild(sprite)
+        let a = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.65), duration: 2)
+        sprite.run(a)
+        
+        //Home
+        let home = SKSpriteNode(imageNamed: "Home Button")
+        home.position = CGPoint(x: -(self.scene.size.width * 0.1), y: self.scene.size.height * 0.25)
+        home.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
+        home.zPosition = 100
+        self.scene.addChild(home)
+        let a2 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.45, y: self.scene.size.height * 0.25), duration: 0.3)
+        home.run(a2)
+        
+        //Restart CheckPoint
+        let restart = SKSpriteNode(imageNamed: "Home Button")
+        restart.position = CGPoint(x: (self.scene.size.width * 1.1), y: self.scene.size.height * 0.25)
+        restart.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
+        restart.zPosition = 100
+        self.scene.addChild(restart)
+        let a3 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.55, y: self.scene.size.height * 0.25), duration: 0.3)
+        restart.run(a3)
+        
+        //Game Over Label
+        var gameOverlabel = SKLabelNode(fontNamed: "Avenir")
+        gameOverlabel.fontSize = 50
+        gameOverlabel.fontColor = UIColor.yellow
+        gameOverlabel.horizontalAlignmentMode = .center
+        gameOverlabel.verticalAlignmentMode = .bottom
+        gameOverlabel.text = "GameOver"
+        gameOverlabel.position = CGPoint(x: self.scene.size.width * 0.5, y: -(self.scene.size.height * 0.1))
+        gameOverlabel.zPosition = 100
+        self.scene.addChild(gameOverlabel)
+        let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
+        gameOverlabel.run(a4)
+        
     }
 }
 
