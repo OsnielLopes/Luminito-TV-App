@@ -70,7 +70,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             scene.scaleMode = .aspectFill
             scene.delegate = self
             scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
-            scene.physicsWorld.contactDelegate = self
+
             
             // Present the scene
             view.presentScene(scene)
@@ -153,6 +153,24 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - ContactDelegate
     
     func didBegin(_ contact: SKPhysicsContact) {
+        
+        let whoTouch = contact.bodyA
+        let wasTouched = contact.bodyB
+        
+        if whoTouch.categoryBitMask == meteorCategory {
+            //Meteor touched something
+            
+            switch wasTouched.categoryBitMask {
+            case luminitoCategory:
+                
+                wasTouched.node?.position = CGPoint(x: 0, y: 0)
+                
+                break
+            default:
+                break
+            }
+            
+        }
         
     }
     
