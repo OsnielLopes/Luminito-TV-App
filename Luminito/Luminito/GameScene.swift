@@ -123,20 +123,20 @@ class GameScene: SKScene {
 //        self.storm.run(m)
         
         //body2?.addChild(storm)
-        self.body2?.color = SKColor.black
-        self.body2?.colorBlendFactor = 0.25
-        let action = SKAction.colorize(with: UIColor.white, colorBlendFactor: 1, duration: 0.3)
-        let actionQuick = SKAction.colorize(with: UIColor.white, colorBlendFactor: 1, duration: 0.1)
-        //self.body2?.run(action)
-
-        self.body2?.run(action, completion: {
-            self.body2?.color = SKColor.black
-            self.body2?.colorBlendFactor = 0.25
-            self.body2?.run(actionQuick)
-            self.body2?.color = SKColor.black
-            self.body2?.colorBlendFactor = 0.25
-            self.body2?.run(actionQuick)
-        })
+//        self.body2?.color = SKColor.black
+//        self.body2?.colorBlendFactor = 0.25
+//        let action = SKAction.colorize(with: UIColor.white, colorBlendFactor: 1, duration: 0.3)
+//        let actionQuick = SKAction.colorize(with: UIColor.white, colorBlendFactor: 1, duration: 0.1)
+//        //self.body2?.run(action)
+//
+//        self.body2?.run(action, completion: {
+//            self.body2?.color = SKColor.black
+//            self.body2?.colorBlendFactor = 0.25
+//            self.body2?.run(actionQuick)
+//            self.body2?.color = SKColor.black
+//            self.body2?.colorBlendFactor = 0.25
+//            self.body2?.run(actionQuick)
+//        })
         
         //var animaiton = SKAction.sequence([])
       
@@ -188,6 +188,35 @@ class GameScene: SKScene {
 //
 //        self.body2?.run(vamosla)
         
+        var teste1:[SKLightNode] = []
+        
+        
+        
+        let a1 = SKAction.run {
+            var storm = SKLightNode()
+            storm.categoryBitMask = 1
+            storm.falloff = 1
+            storm.ambientColor = SKColor.lightGray
+            storm.isEnabled = true
+            storm.position = CGPoint(x: 300, y: 100)
+            teste1.append(storm)
+            self.scene?.addChild(storm)
+        }
+        
+        let a2 = SKAction.wait(forDuration: 0.1)
+        
+        let a3 = SKAction.run {
+            teste1.last?.removeFromParent()
+            teste1.removeLast()
+        }
+        
+        let acts = [a1,a2,a1,a2,a1,a2,a3,a2,a3,a1,a3,a3]
+        let seq = SKAction.sequence(acts)
+        
+        self.scene?.run(seq)
+        
+        
+        
     }
     
     var aux = -1
@@ -204,37 +233,36 @@ class GameScene: SKScene {
         for t in touches { self.touchUp(atPoint: t.location(in: self)) }
     }
     
-    var deltaTime = 0.0
-    var deltaTimeTemp = 0.0
-    var deltaTimeTempForNebula = 4.0
+
+    var deltaTimeTempForNebula = 0.0
     var lastTime: TimeInterval = 0.0
     
     override func update(_ currentTime: TimeInterval) {
         
         
-        print(deltaTimeTemp)
-        if (deltaTimeTemp >= deltaTimeTempForNebula) {
-            
+        
+        
+        
+        
+        
+        //This needs to be the last to avoid return before something
+        var deltaTime = currentTime - lastTime
+        if (deltaTime > deltaTimeTempForNebula) {
+            print(deltaTime)
             guard let gameView = self.view else {return}
-            
             if parallaxManager.isNebulaInScreen == false {
-                self.parallaxManager.startCelestialBody(view: gameView, sprite: "test", width: ((gameView.scene?.size.width)! * 4), height: ((gameView.scene?.size.height)! * 3.4), duration: 60, zPosition: -1)
-            }
                 
-            self.deltaTimeTempForNebula = Double(self.randomGen.generateRandomNumber(min: 60, max: 120))
-            
-            deltaTimeTemp = 0
+                self.deltaTimeTempForNebula = Double(self.randomGen.generateRandomNumber(min: 30, max: 60))
+                
+                self.parallaxManager.startCelestialBody(view: gameView, sprite: "test", width: ((gameView.scene?.size.width)! * 4), height: ((gameView.scene?.size.height)! * 3.4), duration: 20, zPosition: -1)
+            }
+
+        } else {
+            return
         }
-        
-        deltaTime = 0.0
-        deltaTime = currentTime - lastTime
         lastTime = currentTime
-        deltaTimeTemp += deltaTime
-        
-        
     }
-    
-    
+ 
 }
 
 

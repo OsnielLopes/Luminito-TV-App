@@ -80,21 +80,19 @@ class ParallaxManager {
         body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
         view.scene?.addChild(body)
         body.zPosition = zPosition
-        self.isNebulaInScreen = true
         
-//        body.lightingBitMask = 1
-//        body.shadowCastBitMask = 0
-//        body.shadowedBitMask = 1
+        body.lightingBitMask = 1
+        body.shadowCastBitMask = 0
+        body.shadowedBitMask = 1
         
         body.alpha = 0
         
-        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.2),y:0), duration: duration)
+        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.7),y:0), duration: duration)
         let fade = SKAction.fadeAlpha(to: 0.8, duration: 10)
-        
+        self.isNebulaInScreen = true
         body.run(action) {
-            body.run(fade) {
-                self.isNebulaInScreen = true
-            }
+            
+            body.run(fade)
             
             let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5)), y: CGFloat(0))
             let action2 = SKAction.move(to: point, duration: duration)
@@ -105,7 +103,7 @@ class ParallaxManager {
             let fadeOut = SKAction.fadeAlpha(to: 0, duration: 10)
             
             body.run(action2) {
-                
+
                 body.run(action3)
                 body.run(fadeOut) {
                   self.isNebulaInScreen = false
