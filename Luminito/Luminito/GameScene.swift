@@ -39,6 +39,11 @@ class GameScene: SKScene {
         }
         
         luminito.position = CGPoint(x: -(scene?.size.width)!/2.3, y: 0.0)
+        luminito.size = CGSize(width: 100.0, height: 100.0)
+        let range = SKRange(lowerLimit: (((scene?.frame.size.height)!/2) * -1) + 20, upperLimit: ((scene?.frame.size.height)!/2) - 20)
+        let topAndBottomLocker = SKConstraint.positionY(range)
+        
+        luminito.constraints = [ topAndBottomLocker ]
         luminito.isUserInteractionEnabled = true
         self.addChild(luminito)
 
@@ -59,15 +64,17 @@ class GameScene: SKScene {
     
     func touchMoved(toPoint pos : CGPoint) {
         if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            if (pos.y == n.position.y){
-                
+            if(pos.y < (scene?.view?.frame.size.height)!/2 - 30.0 && pos.y > ((scene?.view?.frame.size.height)!/2 * -1) + 30.0){
+                if (pos.y == n.position.y){
+                    
+                }
+                else if (pos.y > n.position.y){
+                    luminito.position.y += 10
+                }else{
+                    luminito.position.y -= 10
+                }
+                self.spinnyNode?.position.y = pos.y
             }
-            else if (pos.y > n.position.y){ 
-                luminito.position.y += 10
-            }else{
-                luminito.position.y -= 10
-            }
-            self.spinnyNode?.position.y = pos.y
         }
     }
     
