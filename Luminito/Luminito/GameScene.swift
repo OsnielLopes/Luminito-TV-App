@@ -15,8 +15,11 @@ class GameScene: SKScene {
     private var spinnyNode : SKShapeNode?
     var luminito = SKSpriteNode(texture: SKTexture(imageNamed: "Character Idle"))
     var meteorArray = [Meteor]()
+    var playing = false
     
     override func didMove(to view: SKView) {
+        
+        addTapGestureRecognizer()
         
         // Get label node from scene and store it for use later
         self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
@@ -109,4 +112,27 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         
     }
+    
+    func addTapGestureRecognizer() {
+        let playPauseButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPauseTapped(sender:)))
+        playPauseButtonRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+        self.view?.addGestureRecognizer(playPauseButtonRecognizer)
+    }
+    
+    @objc func playPauseTapped(sender:AnyObject) {
+        if(playing == false){
+            play()
+        }else{
+            pause()
+        }
+    }
+    
+    func play(){
+        self.scene?.isPaused = false
+    }
+    
+    func pause(){
+        self.scene?.isPaused = true
+    }
+    
 }
