@@ -16,6 +16,7 @@ class GameScene: SKScene {
     var luminito = SKSpriteNode(texture: SKTexture(imageNamed: "Character Idle"))
     var meteorArray = [Meteor]()
     var playing = true
+    var luminitoInteraction = true
     
     override func didMove(to view: SKView) {
         
@@ -66,17 +67,19 @@ class GameScene: SKScene {
     }
     
     func touchMoved(toPoint pos : CGPoint) {
-        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-            if(pos.y < (scene?.view?.frame.size.height)!/2 - 30.0 && pos.y > ((scene?.view?.frame.size.height)!/2 * -1) + 30.0){
-                if (pos.y == n.position.y){
-                    
+        if(luminitoInteraction == true){
+            if let n = self.spinnyNode?.copy() as! SKShapeNode? {
+                if(pos.y < (scene?.view?.frame.size.height)!/2 - 30.0 && pos.y > ((scene?.view?.frame.size.height)!/2 * -1) + 30.0){
+                    if (pos.y == n.position.y){
+                        
+                    }
+                    else if (pos.y > n.position.y){
+                        luminito.position.y += 10
+                    }else{
+                        luminito.position.y -= 10
+                    }
+                    self.spinnyNode?.position.y = pos.y
                 }
-                else if (pos.y > n.position.y){
-                    luminito.position.y += 10
-                }else{
-                    luminito.position.y -= 10
-                }
-                self.spinnyNode?.position.y = pos.y
             }
         }
     }
@@ -131,12 +134,16 @@ class GameScene: SKScene {
         print("play")
         self.isPaused = false
         playing = true
+        luminito.isUserInteractionEnabled = true
+        luminitoInteraction = true
     }
     
     func pause(){
         print("pause")
         self.isPaused = true
         playing = false
+        luminito.isUserInteractionEnabled = false
+        luminitoInteraction = false
     }
     
 }
