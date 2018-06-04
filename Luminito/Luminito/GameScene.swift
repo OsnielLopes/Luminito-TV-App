@@ -15,7 +15,7 @@ class GameScene: SKScene {
     private var spinnyNode : SKShapeNode?
     var luminito = SKSpriteNode(texture: SKTexture(imageNamed: "Character Idle"))
     var meteorArray = [Meteor]()
-    var playing = false
+    var playing = true
     
     override func didMove(to view: SKView) {
         
@@ -128,11 +128,15 @@ class GameScene: SKScene {
     }
     
     func play(){
-        self.scene?.isPaused = false
+        print("play")
+        self.isPaused = false
+        playing = true
     }
     
     func pause(){
-        self.scene?.isPaused = true
+        print("pause")
+        self.isPaused = true
+        playing = false
     }
     
 }
