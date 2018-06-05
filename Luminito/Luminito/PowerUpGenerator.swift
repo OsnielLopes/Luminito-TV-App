@@ -32,7 +32,7 @@ class PowerUpGenerator {
     }
     
     func generateIntangibilityPowerUp() {
-        self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleluminitoCategory)!
+        self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleLuminitoCategory)!
         self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
     }
     

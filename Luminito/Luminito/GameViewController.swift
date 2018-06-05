@@ -24,11 +24,11 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var colectible: Colectible = .intangibility
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
-    let intangibleluminitoCategory: UInt32 = 0x1 << 2
+    let intangibleLuminitoCategory: UInt32 = 0x1 << 2
+    let electronCategory: UInt32 = 0x1 << 3
     var gameover = false
     var playing = true
     var luminitoInteraction = true
-    
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
     var lastTime: TimeInterval = 0.0
@@ -60,6 +60,24 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         }
     }
     
+    lazy var energyLabel: SKLabelNode = {
+        var label = SKLabelNode(fontNamed: "Avenir")
+        label.fontSize = 36
+        label.fontColor = UIColor.yellow
+        label.horizontalAlignmentMode = .right
+        label.verticalAlignmentMode = .bottom
+
+        label.text = "0 N"
+        
+        return label
+    }()
+    
+    var energy: Int = 0 {
+        didSet {
+            self.energyLabel.text = "\(energy) N"
+        }
+    }
+    
     //MARK: - View Life Cicle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,7 +99,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             view.ignoresSiblingOrder = true
             view.showsFPS = true
             view.showsNodeCount = true
-        
+            
             //adds the luminito node
             self.luminito = SKSpriteNode(imageNamed: "Character Wow")
             let position = CGPoint(x: self.scene.frame.width*0.1, y: self.scene.frame.height*0.5)
@@ -95,10 +113,13 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             self.scene.addChild(luminito!)
             
             addMeteors()
+            addElectron()
             
             //add HUD
             self.distanceLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
             self.scene.addChild(self.distanceLabel)
+            self.energyLabel.position = CGPoint(x: (self.scene.frame.width * 0.85) - self.energyLabel.frame.width, y: self.scene.frame.height * 0.95)
+            self.scene.addChild(self.energyLabel)
             
             //add the tap recognizer
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
@@ -115,44 +136,52 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - SKSceneDelegate
     
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
-
+        
         if self.gameover == false {
             if (deltaTimeTemp >= 1.0) {
                 //A second passed, 300.000 km traveled
                 //self.distance -= 300000
                 deltaTimeTemp = 0
             }
-
+            
             //Update calls it 60 times per second, so in one second is 5000 * 60 = 300.000  km (1s c)
             if self.colectible == .velocityBoost {
                 distance -= 15000
             } else {
                 distance -= 5000
             }
-        
+            
             deltaTime = 0.0
             deltaTime = currentTime - lastTime
             lastTime = currentTime
             deltaTimeTemp += deltaTime
-
-                scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
+            
+            scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
                 guard let meteor = node as? SKMeteorNode else {
                     print("Impossible to convert the node to a SKMeteorNode")
                     return
                 }
-            
+                
                 //If meteor is off the Scene
                 if !((self.scene.view?.frame.contains(meteor.position))!) {
-                
+                    
                     //Sets meteor new position
                     let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
                     meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
                 }
-            
+                
                 if self.colectible == .none {
                     meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
                 }
+            }
             
+            scene.enumerateChildNodes(withName: "electron") { (electron, stop) in
+                //If the electron is off the scene
+                if !((self.scene.view?.frame.contains(electron.position))!) {
+                    //Sets electron new position
+                    let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+                    electron.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+                }
             }
         }
     }
@@ -180,7 +209,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                     meteor.physicsBody = nil
                 }
                 
-                whoTouch.categoryBitMask = intangibleluminitoCategory
+                whoTouch.categoryBitMask = intangibleLuminitoCategory
                 let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
                 let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
                 let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
@@ -204,6 +233,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
     }
     
+    //MARK: - Gesture Recognition
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         for touch in touches {
@@ -211,14 +242,12 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             let pos = touch.location(in: self.scene)
             
             
-                    luminito?.position.y = pos.y
+            luminito?.position.y = pos.y
             
             
         }
         
     }
-    
-    //MARK: - Gesture Recognition
     
     @objc func didTap(){
         
@@ -283,14 +312,36 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.meteors.append(meteor)
         //adds the movement
         meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
+        
+        //        let timeInterval = TimeInterval(arc4random_uniform(10)+5)
+        //        let animation = SKAction.moveTo(x: 0, duration: timeInterval)
+        //        meteor.run(animation) {
+        //            //after the completion of the animation, the node is removed from the screen and a new node is then added
+        //            meteor.removeFromParent()
+        //            self.addMeteor()
+        //        }
+    }
     
-//        let timeInterval = TimeInterval(arc4random_uniform(10)+5)
-//        let animation = SKAction.moveTo(x: 0, duration: timeInterval)
-//        meteor.run(animation) {
-//            //after the completion of the animation, the node is removed from the screen and a new node is then added
-//            meteor.removeFromParent()
-//            self.addMeteor()
-//        }
+    func addElectron() {
+        
+        let electron = SKSpriteNode(imageNamed: "electron")
+        electron.size = CGSize(width: electron.size.width*0.1, height: electron.size.height*0.1)
+        electron.name = "electron"
+        let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+        electron.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+        
+        let electronPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "electron"), size: electron.size)
+        electronPhysicsBody.categoryBitMask = electronCategory
+        electronPhysicsBody.collisionBitMask = luminitoCategory
+        electronPhysicsBody.contactTestBitMask = luminitoCategory
+        electronPhysicsBody.isDynamic = true
+        electronPhysicsBody.linearDamping = 0
+        electronPhysicsBody.velocity = CGVector(dx: -100, dy: 0)
+        electron.physicsBody = electronPhysicsBody
+        
+        self.scene.addChild(electron)
+        
+        //        electron.physicsBody?.velocity = CGVector(dx: -100, dy: 0)
     }
     
     func createRandomMeteor() -> SKMeteorNode {
@@ -325,26 +376,26 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         
         // Create an effects node with blur
-//        let effectsNode = SKEffectNode()
-//        let filter = CIFilter(name: "CIGaussianBlur")
-//        // Set the blur amount. Adjust this to achieve the desired effect
-//        let blurAmount = 10.0
-//        filter?.setValue(blurAmount, forKey: kCIInputRadiusKey)
-//
-//        effectsNode.filter = filter
-//        effectsNode.position = CGPoint(x: 0, y: 0)
-//        effectsNode.blendMode = .alpha
+        //        let effectsNode = SKEffectNode()
+        //        let filter = CIFilter(name: "CIGaussianBlur")
+        //        // Set the blur amount. Adjust this to achieve the desired effect
+        //        let blurAmount = 10.0
+        //        filter?.setValue(blurAmount, forKey: kCIInputRadiusKey)
+        //
+        //        effectsNode.filter = filter
+        //        effectsNode.position = CGPoint(x: 0, y: 0)
+        //        effectsNode.blendMode = .alpha
         
         // Add the sprite to effects node to the sprite be blurred
-//        let nodes = self.scene.children
-//        self.scene.removeAllChildren()
-//        for node in nodes {
-//            self.gameover = true
-//            node.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-//            node.physicsBody = nil
-//            effectsNode.addChild(node)
-//        }
-//        self.scene.addChild(effectsNode)
+        //        let nodes = self.scene.children
+        //        self.scene.removeAllChildren()
+        //        for node in nodes {
+        //            self.gameover = true
+        //            node.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        //            node.physicsBody = nil
+        //            effectsNode.addChild(node)
+        //        }
+        //        self.scene.addChild(effectsNode)
         
         //Not blurred
         
