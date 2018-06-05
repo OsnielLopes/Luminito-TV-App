@@ -12,6 +12,7 @@ import SpriteKit
 class ParallaxManager {
     
     var isNebulaInScreen = false
+    let randomGen = RandomGenerator()
     
     func startBackGroundParallax(view: SKView, sprite: String, duration: TimeInterval, zPosition: CGFloat) {
         
@@ -30,8 +31,8 @@ class ParallaxManager {
         bg1.zPosition = zPosition
         
         if sprite == "smallStars" {
-            bg.alpha = 0.3
-            bg1.alpha = 0.3
+            bg.alpha = 0.4
+            bg1.alpha = 0.4
         }
         
         let p1 = CGPoint(x: 0, y: 0)
@@ -57,21 +58,18 @@ class ParallaxManager {
         bg.run(firstSeq) {
             bg.run(act)
         }
-        
-        
-        
-        
+
     }
     
     func startCelestialBody(view: SKView, sprite: String, width: CGFloat, height: CGFloat, duration: TimeInterval, zPosition: CGFloat) {
         
-        if sprite == "test" {
+        if sprite == "nebula" {
             startNebula(view: view, sprite: sprite, width: width, height: height, duration: duration, zPosition: zPosition)
         }
 
     }
     
-    //MARK: - Manager internal methods
+    //MARK: - Manager internal methods and CelestialBody methods
     
     func startNebula(view: SKView, sprite: String, width: CGFloat, height: CGFloat, duration: TimeInterval, zPosition: CGFloat) {
         
@@ -92,7 +90,16 @@ class ParallaxManager {
         self.isNebulaInScreen = true
         body.run(action) {
             
-            body.run(fade)
+            body.run(fade, completion: {
+                
+                let storm = SKAction.run {
+                    self.stormAnimation(view: view)
+                }
+                
+                body.run(storm, completion: {
+                    self.stormAnimation(view: view)
+                })
+            })
             
             let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5)), y: CGFloat(0))
             let action2 = SKAction.move(to: point, duration: duration)
@@ -111,6 +118,40 @@ class ParallaxManager {
             }
         }
         
+    }
+    
+    //MARK: - Animations
+    
+    func stormAnimation(view: SKView) {
+        var lights:[SKLightNode] = []
+        
+        let x = self.randomGen.generateRandomNumber(min: -100, max: 300)
+        let y = self.randomGen.generateRandomNumber(min: -200, max: 200)
+        
+        let a1 = SKAction.run {
+            let light = SKLightNode()
+            light.categoryBitMask = 1
+            light.falloff = 1
+            light.ambientColor = SKColor.lightGray
+            light.isEnabled = true
+            light.position = CGPoint(x: x, y: y)
+            lights.append(light)
+            view.scene?.addChild(light)
+        }
+        
+        let a2 = SKAction.wait(forDuration: 0.1)
+        
+        let a3 = SKAction.run {
+            lights.last?.removeFromParent()
+            lights.removeLast()
+        }
+        
+        let acts = [a1,a2,a1,a2,a1,a2,a3,a2,a3,a1,a3,a3]
+        let seq = SKAction.sequence(acts)
+        
+        let finalSeq = SKAction.sequence([seq,a2,a2,seq,seq])
+        
+        view.scene?.run(finalSeq)
     }
     
     
