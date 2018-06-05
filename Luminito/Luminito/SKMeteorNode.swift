@@ -13,10 +13,9 @@ class SKMeteorNode: SKSpriteNode {
     //MARK: - Variables
     var initialVelocity: Int
     
-    init(imageNamed: String, initialVelocity: Int){
+    init(texture: SKTexture, initialVelocity: Int, size: CGSize){
         self.initialVelocity = initialVelocity
-        let texture = SKTexture(imageNamed: imageNamed)
-        super.init(texture: texture, color: UIColor.clear, size: texture.size())
+        super.init(texture: texture, color: UIColor.clear, size: size)
     }
     
     required init?(coder aDecoder: NSCoder) {

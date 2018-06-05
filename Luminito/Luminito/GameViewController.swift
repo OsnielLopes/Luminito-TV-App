@@ -26,6 +26,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let meteorCategory: UInt32 = 0x1 << 1
     let intangibleluminitoCategory: UInt32 = 0x1 << 2
     var gameover = false
+    var playing = true
+    var luminitoInteraction = true
     
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
@@ -72,6 +74,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             scene.delegate = self
             scene.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
             scene.physicsWorld.contactDelegate = self
+            self.addTapGestureRecognizer()
             
             // Present the scene
             view.presentScene(scene)
@@ -201,6 +204,19 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
     }
     
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        for touch in touches {
+            
+            let pos = touch.location(in: self.scene)
+            
+            
+                    luminito?.position.y = pos.y
+            
+            
+        }
+        
+    }
     
     //MARK: - Gesture Recognition
     
@@ -242,13 +258,14 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     private func addMeteors() {
         for _ in 0..<10{
-            addMeteor()
+            //addMeteor()
         }
     }
     
     func addMeteor(){
-        let xVelocity = -(Int(arc4random_uniform(200))+200)
-        let meteor = SKMeteorNode(imageNamed: "Asteroide Pequeno", initialVelocity: xVelocity)
+        
+        let meteor = self.createRandomMeteor()
+        
         meteor.name = "meteor"
         let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
         let meteorPosition = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
@@ -265,7 +282,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.scene.addChild(meteor)
         self.meteors.append(meteor)
         //adds the movement
-        meteor.physicsBody?.velocity = CGVector(dx: xVelocity, dy: 0)
+        meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
     
 //        let timeInterval = TimeInterval(arc4random_uniform(10)+5)
 //        let animation = SKAction.moveTo(x: 0, duration: timeInterval)
@@ -274,6 +291,28 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
 //            meteor.removeFromParent()
 //            self.addMeteor()
 //        }
+    }
+    
+    func createRandomMeteor() -> SKMeteorNode {
+        
+        let texture: SKTexture?
+        let size: CGSize?
+        let xVelocity = -(Int(arc4random_uniform(200))+200)
+        
+        var type = Int(arc4random_uniform(2))
+        let randomNumber2 = Float(arc4random()) / Float(UInt32.max)
+        
+        if(type == 1){
+            texture = SKTexture(imageNamed: "Asteroide Grande")
+            size = CGSize(width: 50, height: 50)
+        }else{
+            texture = SKTexture(imageNamed: "Asteroide Pequeno")
+            size = CGSize(width: 30, height: 30)
+        }
+        
+        let meteor = SKMeteorNode(texture: texture!, initialVelocity: xVelocity, size: size!)
+        
+        return meteor
     }
     
     func gameOver(){
@@ -349,6 +388,34 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
         gameOverlabel.run(a4)
         
+    }
+    
+    func addTapGestureRecognizer() {
+        let playPauseButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPauseTapped(sender:)))
+        playPauseButtonRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+        self.view?.addGestureRecognizer(playPauseButtonRecognizer)
+    }
+    
+    @objc func playPauseTapped(sender:AnyObject) {
+        if(playing == false){
+            play()
+        }else{
+            pause()
+        }
+    }
+    
+    func play(){
+        print("play")
+        self.scene.isPaused = false
+        playing = true
+        luminitoInteraction = true
+    }
+    
+    func pause(){
+        print("pause")
+        self.scene.isPaused = true
+        playing = false
+        luminitoInteraction = false
     }
 }
 
