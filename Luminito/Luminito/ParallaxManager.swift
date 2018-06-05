@@ -91,14 +91,7 @@ class ParallaxManager {
         body.run(action) {
             
             body.run(fade, completion: {
-                
-                let storm = SKAction.run {
-                    self.stormAnimation(view: view)
-                }
-                
-                body.run(storm, completion: {
-                    self.stormAnimation(view: view)
-                })
+                self.stormAnimation(node: body)
             })
             
             let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5)), y: CGFloat(0))
@@ -121,22 +114,24 @@ class ParallaxManager {
     }
     
     //MARK: - Animations
-    
-    func stormAnimation(view: SKView) {
+
+    func stormAnimation(node: SKNode) {
+
         var lights:[SKLightNode] = []
+        let x = self.randomGen.generateRandomNumber(min: -250, max: 400)
+        let y = self.randomGen.generateRandomNumber(min: -300, max: 300)
         
-        let x = self.randomGen.generateRandomNumber(min: -100, max: 300)
-        let y = self.randomGen.generateRandomNumber(min: -200, max: 200)
+        
         
         let a1 = SKAction.run {
             let light = SKLightNode()
             light.categoryBitMask = 1
             light.falloff = 1
-            light.ambientColor = SKColor.lightGray
+            light.ambientColor = SKColor.darkGray
             light.isEnabled = true
             light.position = CGPoint(x: x, y: y)
             lights.append(light)
-            view.scene?.addChild(light)
+            node.addChild(light)
         }
         
         let a2 = SKAction.wait(forDuration: 0.1)
@@ -151,7 +146,8 @@ class ParallaxManager {
         
         let finalSeq = SKAction.sequence([seq,a2,a2,seq,seq])
         
-        view.scene?.run(finalSeq)
+        node.run(finalSeq)
+        
     }
     
     
