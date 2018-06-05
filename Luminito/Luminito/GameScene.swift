@@ -9,6 +9,7 @@
 import SpriteKit
 import GameplayKit
 
+
 class GameScene: SKScene {
     
     private var label : SKLabelNode?
@@ -18,9 +19,12 @@ class GameScene: SKScene {
     var playing = true
     var luminitoInteraction = true
     
+    
     override func didMove(to view: SKView) {
         
         addTapGestureRecognizer()
+        addUpTapGestureRecognizer()
+        addDownTapGestureRecognizer()
         
         // Get label node from scene and store it for use later
         self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
@@ -70,16 +74,17 @@ class GameScene: SKScene {
         if(luminitoInteraction == true){
             if let n = self.spinnyNode?.copy() as! SKShapeNode? {
                 if(pos.y < (scene?.view?.frame.size.height)!/2 - 30.0 && pos.y > ((scene?.view?.frame.size.height)!/2 * -1) + 30.0){
-                    if (pos.y == n.position.y){
-                        
-                    }
-                    else if (pos.y > n.position.y){
-                        luminito.position.y += 10
+//                    if (pos.y == n.position.y){
+//
+//                    }
+                    if (pos.y > n.position.y){
+                        luminito.position.y += 18
                     }else{
-                        luminito.position.y -= 10
+                        luminito.position.y -= 18
                     }
                     self.spinnyNode?.position.y = pos.y
                 }
+                self.spinnyNode?.position.y = pos.y
             }
         }
     }
@@ -93,15 +98,22 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
         if let label = self.label {
             label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
         }
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+        for t in touches { self.touchDown(atPoint: t.location(in: self))
+            
+            print(t.location(in: self))
+            
+        }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+        for t in touches {
+            self.touchMoved(toPoint: t.location(in: self))
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -119,7 +131,22 @@ class GameScene: SKScene {
     func addTapGestureRecognizer() {
         let playPauseButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.playPauseTapped(sender:)))
         playPauseButtonRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.playPause.rawValue)]
+        
         self.view?.addGestureRecognizer(playPauseButtonRecognizer)
+    }
+    
+    func addUpTapGestureRecognizer(){
+        let upTapButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.upTapped(sender:)))
+        upTapButtonRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.upArrow.rawValue)]
+        
+        self.view?.addGestureRecognizer(upTapButtonRecognizer)
+    }
+    
+    func addDownTapGestureRecognizer(){
+        let downTapButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.downTapped(sender:)))
+        downTapButtonRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.downArrow.rawValue)]
+        
+        self.view?.addGestureRecognizer(downTapButtonRecognizer)
     }
     
     @objc func playPauseTapped(sender:AnyObject) {
@@ -130,6 +157,22 @@ class GameScene: SKScene {
         }
     }
     
+    @objc func upTapped(sender:AnyObject) {
+        if(luminitoInteraction == true){
+            if(luminitoInteraction == true){
+                luminito.position.y += 50
+            }
+        }
+    }
+
+    @objc func downTapped(sender:AnyObject) {
+        if(luminitoInteraction == true){
+            if(luminitoInteraction == true){
+                luminito.position.y -= 50
+            }
+        }
+    }
+
     func play(){
         print("play")
         self.isPaused = false
