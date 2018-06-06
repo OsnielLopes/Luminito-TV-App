@@ -65,6 +65,10 @@ class ParallaxManager {
         
         if sprite == "nebula" {
             startNebula(view: view, sprite: sprite, width: width, height: height, duration: duration, zPosition: zPosition)
+        } else if sprite == "Sun" {
+            startSun(view: view, sprite: sprite, width: width, height: height, duration: duration, zPosition: zPosition)
+        } else {
+            startPlanet(view: view, sprite: sprite, width: width, height: height, duration: duration, zPosition: zPosition)
         }
 
     }
@@ -113,6 +117,41 @@ class ParallaxManager {
         
     }
     
+    func startPlanet(view: SKView, sprite: String, width: CGFloat, height: CGFloat, duration: TimeInterval, zPosition: CGFloat) {
+        
+        let body = SKSpriteNode(imageNamed: sprite)
+        body.size = CGSize(width: width, height: height)
+        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
+        view.scene?.addChild(body)
+        body.zPosition = zPosition
+        
+        body.alpha = 0.9
+        
+        let action = SKAction.move(to: CGPoint(x:-((view.scene?.size.width)! * 0.7),y:0), duration: duration)
+        
+        body.run(action) {
+            body.removeFromParent()
+        }
+        
+    }
+    
+    func startSun(view: SKView, sprite: String, width: CGFloat, height: CGFloat, duration: TimeInterval, zPosition: CGFloat) {
+        
+        let body = SKSpriteNode(imageNamed: sprite)
+        body.size = CGSize(width: width, height: height)
+        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
+        view.scene?.addChild(body)
+        body.zPosition = zPosition
+        
+        body.alpha = 0.9
+        
+        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.4),y:0), duration: duration)
+        
+        body.run(action) {
+            body.removeFromParent()
+        }
+    }
+    
     //MARK: - Animations
 
     func stormAnimation(node: SKNode) {
@@ -120,8 +159,6 @@ class ParallaxManager {
         var lights:[SKLightNode] = []
         let x = self.randomGen.generateRandomNumber(min: -250, max: 400)
         let y = self.randomGen.generateRandomNumber(min: -300, max: 300)
-        
-        
         
         let a1 = SKAction.run {
             let light = SKLightNode()
