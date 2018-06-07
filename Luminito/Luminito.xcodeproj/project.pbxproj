@@ -16,6 +16,8 @@
 		49375B5D20BF2CAF002403CD /* SKMeteorNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */; };
 		49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */; };
 		EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */; };
+		EBE3D03A20C9B889009ED686 /* ParallaxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03920C9B889009ED686 /* ParallaxManager.swift */; };
+		EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 		49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorNode.swift; sourceTree = "<group>"; };
 		49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorPhysicsBody.swift; sourceTree = "<group>"; };
 		EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerUpGenerator.swift; sourceTree = "<group>"; };
+		EBE3D03920C9B889009ED686 /* ParallaxManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParallaxManager.swift; sourceTree = "<group>"; };
+		EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +72,8 @@
 				492CD38D20BC76D4007157B5 /* GameViewController.swift */,
 				49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */,
 				49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */,
+				EBE3D03920C9B889009ED686 /* ParallaxManager.swift */,
+				EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */,
 				492CD38F20BC76D4007157B5 /* Main.storyboard */,
 				492CD39220BC76D7007157B5 /* Assets.xcassets */,
 				492CD39420BC76D7007157B5 /* Info.plist */,
@@ -147,8 +153,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */,
 				EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */,
 				492CD38C20BC76D4007157B5 /* GameScene.swift in Sources */,
+				EBE3D03A20C9B889009ED686 /* ParallaxManager.swift in Sources */,
 				49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */,
 				49375B5D20BF2CAF002403CD /* SKMeteorNode.swift in Sources */,
 				492CD38E20BC76D4007157B5 /* GameViewController.swift in Sources */,

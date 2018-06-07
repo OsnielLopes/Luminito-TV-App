@@ -14,6 +14,41 @@ enum Colectible {
     case velocityBoost, meteorRepellent, meteorDestroyer, magnet, oneMoreLife, intangibility, none
 }
 
+enum PlanetDistances: Int {
+    
+    /*
+     
+     Pluto - 5.913.520.000
+     Neptune - 4.504.300.000
+     Uranus - 2.870.990.000
+     Saturn - 1.429.400.000
+     Jupiter - 778.330.000
+     Mars - 227.940.000
+     Earth - 149.600.000
+     Venus - 108.200.000
+     Mercury - 57.910.000
+     Sun - 0
+     
+     */
+    
+    case Sun = 0
+    case mercury = 57910000
+    case venus = 108200000
+    case earth = 149600000
+    case mars = 227940000
+    case jupiter = 778330000
+    case saturn = 1429400000
+    case uranus = 2870990000
+    case neptune = 4504300000
+    case pluto = 5913520000
+}
+
+struct Planets {
+    var name: String
+    var distance: PlanetDistances
+    var size: Int
+}
+
 class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDelegate {
     
     //MARK: - Luminito
@@ -32,6 +67,9 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
     var lastTime: TimeInterval = 0.0
+    var randomGen = RandomGenerator()
+    var parallaxManager = ParallaxManager()
+    var planetsArray: [Planets] = []
     
     //MARK: - Managers
     var powerUpGenerator: PowerUpGenerator?
@@ -94,11 +132,21 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             scene.physicsWorld.contactDelegate = self
             self.addTapGestureRecognizer()
             
+            //Set Background
+            let background = SKSpriteNode(imageNamed: "SpaceBG")
+            background.position = (self.view?.center)!
+            background.zPosition = -5
+            scene?.addChild(background)
+            
             // Present the scene
             view.presentScene(scene)
             view.ignoresSiblingOrder = true
             view.showsFPS = true
             view.showsNodeCount = true
+            
+            //Set Star Parallax
+            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "smallStars", duration: 500, zPosition: -4)
+            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "mediumSmallStars", duration: 250, zPosition: -3)
             
             //adds the luminito node
             self.luminito = SKSpriteNode(imageNamed: "Character Wow")
