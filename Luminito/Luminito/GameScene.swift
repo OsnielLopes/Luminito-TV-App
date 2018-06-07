@@ -13,6 +13,7 @@ class GameScene: SKScene {
     
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
+    
     var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
     var foreveLabel = SKSpriteNode(imageNamed: "Forever")
     var playButton = SKSpriteNode(imageNamed: "Menu Play Button")
@@ -40,25 +41,28 @@ class GameScene: SKScene {
                                               SKAction.removeFromParent()]))
         }
         
+        luminitoLabel.name = "Luminito Label"
         luminitoLabel.position = CGPoint(x: 1000.0, y: 150.0)
-        luminitoLabel.size = CGSize(width: 280.0, height: 115.0)
+        luminitoLabel.size = CGSize(width: 320.0, height: 115.0)
         self.addChild(luminitoLabel)
         
+        foreveLabel.name = "Forever Label"
         foreveLabel.position = CGPoint(x: 1000.0, y: 50.0)
-        foreveLabel.size = CGSize(width: 200.0, height: 100.0)
+        foreveLabel.size = CGSize(width: 230.0, height: 100.0)
         self.addChild(foreveLabel)
         
+        playButton.name = "Play Button"
         playButton.position = CGPoint(x: 1000.0, y: -50.0)
         playButton.size = CGSize(width: 140.0, height: 62.0)
         self.addChild(playButton)
         
+        storeButton.name = "Store Button"
         storeButton.position = CGPoint(x: 1000.0, y: -120.0)
         storeButton.size = CGSize(width: 140.0, height: 62.0)
         self.addChild(storeButton)
         
-        
-        moveMenuToCenter()
-        
+        let menu = Menu.init(gameScene: self)
+        menu.moveMenuToCenter(gameScene: self)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -81,34 +85,6 @@ class GameScene: SKScene {
         for t in touches {
             
         }
-    }
-    
-    func moveMenuToCenter(){
-        let moveLuminitoToCenter = SKAction.move(to: CGPoint(x: 0.0, y: 150.0), duration: 1.5)
-        luminitoLabel.run(moveLuminitoToCenter)
-        
-        let moveForeverLabelToCenter = SKAction.move(to: CGPoint(x: 0.0, y: 50.0), duration: 1.5)
-        foreveLabel.run(moveForeverLabelToCenter)
-        
-        let movePlayButtonToCenter = SKAction.move(to: CGPoint(x: 0.0, y: -50.0), duration: 1.5)
-        playButton.run(movePlayButtonToCenter)
-        
-        let moveStoreButtonToCenter = SKAction.move(to: CGPoint(x: 0.0, y: -120.0), duration: 1.5)
-        storeButton.run(moveStoreButtonToCenter)
-    }
-    
-    func moveMenuToLeftSide(){
-        let moveLuminitoToCenter = SKAction.move(to: CGPoint(x: -1000.0, y: 150.0), duration: 1.5)
-        luminitoLabel.run(moveLuminitoToCenter)
-        
-        let moveForeverLabelToCenter = SKAction.move(to: CGPoint(x: -1000.0, y: 50.0), duration: 1.5)
-        foreveLabel.run(moveForeverLabelToCenter)
-        
-        let movePlayButtonToCenter = SKAction.move(to: CGPoint(x: -1000.0, y: -50.0), duration: 1.5)
-        playButton.run(movePlayButtonToCenter)
-        
-        let moveStoreButtonToCenter = SKAction.move(to: CGPoint(x: -1000.0, y: -120.0), duration: 1.5)
-        storeButton.run(moveStoreButtonToCenter)
     }
     
     override func update(_ currentTime: TimeInterval) {
