@@ -40,7 +40,7 @@ enum PlanetDistances: Int {
     case saturn = 1429400000
     case uranus = 2870990000
     case neptune = 4504300000
-    case pluto = 5913520000
+    case pluto = 5993520000
 }
 
 struct Planets {
@@ -120,6 +120,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.fillPlanetsArray()
         self.powerUpGenerator = PowerUpGenerator(gameViewController: self)
         
         if let view = self.view as! SKView? {
@@ -136,7 +137,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             let background = SKSpriteNode(imageNamed: "SpaceBG")
             background.position = (self.view?.center)!
             background.zPosition = -5
-            scene?.addChild(background)
+            //scene?.addChild(background)
             
             // Present the scene
             view.presentScene(scene)
@@ -145,8 +146,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             view.showsNodeCount = true
             
             //Set Star Parallax
-            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "smallStars", duration: 500, zPosition: -4)
-            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "mediumSmallStars", duration: 250, zPosition: -3)
+            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "smallStars", duration: 10, zPosition: -4)
+//            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "mediumSmallStars", duration: 250, zPosition: -3)
             
             //adds the luminito node
             self.luminito = SKSpriteNode(imageNamed: "Character Wow")
@@ -182,13 +183,34 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     
     //MARK: - SKSceneDelegate
-    
+    var second = 0
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         
         if self.gameover == false {
+            
+            if distance < (self.planetsArray.last?.distance.rawValue)! {
+                
+                let planet = self.planetsArray.last
+                guard let gameView = scene.view else {return}
+                self.parallaxManager.startCelestialBody(view: gameView, sprite: (planet?.name)!, width: CGFloat((planet?.size)!), height: CGFloat((planet?.size)!), duration: 60, zPosition: -1)
+                self.planetsArray.removeLast()
+            }
+            
+            
             if (deltaTimeTemp >= 1.0) {
                 //A second passed, 300.000 km traveled
                 //self.distance -= 300000
+                
+                second += 1
+                
+                if second == 120 {
+                    if parallaxManager.isNebulaInScreen == false {
+                        guard let gameView = scene.view else {return}
+                        self.parallaxManager.startCelestialBody(view: gameView, sprite: "nebula", width: ((gameView.scene?.size.width)! * 6), height: ((gameView.scene?.size.height)! * 5.1), duration: 20, zPosition: -1)
+                      
+                    }
+                }
+                
                 deltaTimeTemp = 0
             }
             
@@ -412,6 +434,27 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         let meteor = SKMeteorNode(texture: texture!, initialVelocity: xVelocity, size: size!)
         
         return meteor
+    }
+    
+    func fillPlanetsArray() {
+        let mercury = Planets(name: "Mercurio 2", distance: PlanetDistances.mercury, size: 50)
+        self.planetsArray.append(mercury)
+        let venus = Planets(name: "Venus 2", distance: PlanetDistances.venus, size: 90)
+        self.planetsArray.append(venus)
+        let earth = Planets(name: "Terra 2", distance: PlanetDistances.earth, size: 100)
+        self.planetsArray.append(earth)
+        let mars = Planets(name: "Marte 2", distance: PlanetDistances.mars, size: 80)
+        self.planetsArray.append(mars)
+        let jupiter = Planets(name: "Jupiter 2", distance: PlanetDistances.jupiter, size: 200)
+        self.planetsArray.append(jupiter)
+        let saturn = Planets(name: "Saturno 2", distance: PlanetDistances.saturn, size: 180)
+        self.planetsArray.append(saturn)
+        let uranus = Planets(name: "Urano 2", distance: PlanetDistances.uranus, size: 150)
+        self.planetsArray.append(uranus)
+        let neptune = Planets(name: "Netuno 2", distance: PlanetDistances.neptune, size: 140)
+        self.planetsArray.append(neptune)
+        let pluto = Planets(name: "Plutao 2", distance: PlanetDistances.pluto, size: 40)
+        self.planetsArray.append(pluto)
     }
     
     func gameOver(){

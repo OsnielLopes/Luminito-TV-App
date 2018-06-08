@@ -16,17 +16,22 @@ class ParallaxManager {
     
     func startBackGroundParallax(view: SKView, sprite: String, duration: TimeInterval, zPosition: CGFloat) {
         
+        
+        
+        
+        
         //FIRST SHOWN IN THE SCREEN
         let bg = SKSpriteNode(imageNamed: sprite)
         bg.size = CGSize(width: (view.scene?.size.width)!, height: (view.scene?.size.height)!)
-        bg.position = CGPoint(x: 0, y: (view.scene?.size.height)! * 0.5)
+        bg.position = CGPoint(x: (view.scene?.size.width)! * 0.5, y: (view.scene?.size.height)! * 0.5)
         view.scene?.addChild(bg)
         bg.zPosition = zPosition
         
         //NEXT SHOWN IN THE SCREEN
+        
         let bg1 = SKSpriteNode(imageNamed: sprite)
         bg1.size = CGSize(width: (view.scene?.size.width)!, height: (view.scene?.size.height)!)
-        bg1.position = CGPoint(x: (view.scene?.size.width)!, y: (view.scene?.size.height)! * 0.5)
+        bg1.position = CGPoint(x: (view.scene?.size.width)! * 1.5, y: (view.scene?.size.height)! * 0.5)
         view.scene?.addChild(bg1)
         bg1.zPosition = zPosition
         
@@ -35,9 +40,9 @@ class ParallaxManager {
             bg1.alpha = 0.4
         }
         
-        let p1 = CGPoint(x: 0, y: (view.scene?.size.height)! * 0.5)
-        let p2 = CGPoint(x: -(view.scene?.size.width)!, y: CGFloat((view.scene?.size.height)! * 0.5))
-        let p3 = CGPoint(x: (view.scene?.size.width)!, y: CGFloat((view.scene?.size.height)! * 0.5))
+        let p1 = CGPoint(x: (view.scene?.size.width)! * 0.5, y: (view.scene?.size.height)! * 0.5)
+        let p2 = CGPoint(x: -(view.scene?.size.width)! * 0.5, y: CGFloat((view.scene?.size.height)! * 0.5))
+        let p3 = CGPoint(x: (view.scene?.size.width)! * 0.5 + bg.size.width, y: CGFloat((view.scene?.size.height)! * 0.5))
         
         //BG FIRST ACTIONS
         let moveLeft1 = SKAction.move(to: p2, duration: duration)
@@ -79,7 +84,7 @@ class ParallaxManager {
         
         let body = SKSpriteNode(imageNamed: sprite)
         body.size = CGSize(width: width, height: height)
-        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
+        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: (view.scene?.size.height)! * 0.5)
         view.scene?.addChild(body)
         body.zPosition = zPosition
         
@@ -89,7 +94,7 @@ class ParallaxManager {
         
         body.alpha = 0
         
-        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.7),y:0), duration: duration)
+        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.7),y:(view.scene?.size.height)! * 0.5), duration: duration)
         let fade = SKAction.fadeAlpha(to: 0.8, duration: 10)
         self.isNebulaInScreen = true
         body.run(action) {
@@ -98,10 +103,10 @@ class ParallaxManager {
                 self.stormAnimation(node: body)
             })
             
-            let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5)), y: CGFloat(0))
+            let point = CGPoint(x: (-((view.scene?.size.width)! * 0.5)), y: CGFloat((view.scene?.size.height)! * 0.5))
             let action2 = SKAction.move(to: point, duration: duration)
             
-            let point2 = CGPoint(x: -((view.scene?.size.width)! * 1.2), y: 0)
+            let point2 = CGPoint(x: -((view.scene?.size.width)! * 1.2), y: (view.scene?.size.height)! * 0.5)
             let action3 = SKAction.move(to: point2, duration: duration)
             
             let fadeOut = SKAction.fadeAlpha(to: 0, duration: 10)
@@ -121,13 +126,13 @@ class ParallaxManager {
         
         let body = SKSpriteNode(imageNamed: sprite)
         body.size = CGSize(width: width, height: height)
-        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
+        body.position = CGPoint(x: ((view.scene?.size.width)! + (width * 0.5)), y: (view.scene?.size.height)! * 0.5)
         view.scene?.addChild(body)
         body.zPosition = zPosition
         
         body.alpha = 0.9
         
-        let action = SKAction.move(to: CGPoint(x:-((view.scene?.size.width)! * 0.7),y:0), duration: duration)
+        let action = SKAction.move(to: CGPoint(x:-((view.scene?.size.width)! * 0.7),y:(view.scene?.size.height)! * 0.5), duration: duration)
         
         body.run(action) {
             body.removeFromParent()
@@ -139,13 +144,13 @@ class ParallaxManager {
         
         let body = SKSpriteNode(imageNamed: sprite)
         body.size = CGSize(width: width, height: height)
-        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
+        body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: (view.scene?.size.height)! * 0.5)
         view.scene?.addChild(body)
         body.zPosition = zPosition
         
         body.alpha = 0.9
         
-        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.4),y:0), duration: duration)
+        let action = SKAction.move(to: CGPoint(x:((view.scene?.size.width)! * 0.4),y:(view.scene?.size.height)! * 0.5), duration: duration)
         
         body.run(action) {
             body.removeFromParent()
@@ -157,8 +162,8 @@ class ParallaxManager {
     func stormAnimation(node: SKNode) {
 
         var lights:[SKLightNode] = []
-        let x = self.randomGen.generateRandomNumber(min: -250, max: 400)
-        let y = self.randomGen.generateRandomNumber(min: -300, max: 300)
+        let x = self.randomGen.generateRandomNumber(min: 200, max: 600)
+        let y = self.randomGen.generateRandomNumber(min: 200, max: 600)
         
         let a1 = SKAction.run {
             let light = SKLightNode()
