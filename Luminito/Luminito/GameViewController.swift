@@ -40,7 +40,7 @@ enum PlanetDistances: Int {
     case saturn = 1429400000
     case uranus = 2870990000
     case neptune = 4504300000
-    case pluto = 5993520000
+    case pluto = 5913520000
 }
 
 struct Planets {
@@ -137,7 +137,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             let background = SKSpriteNode(imageNamed: "SpaceBG")
             background.position = (self.view?.center)!
             background.zPosition = -5
-            //scene?.addChild(background)
+            scene?.addChild(background)
             
             // Present the scene
             view.presentScene(scene)
@@ -146,8 +146,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             view.showsNodeCount = true
             
             //Set Star Parallax
-            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "smallStars", duration: 10, zPosition: -4)
-//            self.parallaxManager.startBackGroundParallax(view: scene.view!, sprite: "mediumSmallStars", duration: 250, zPosition: -3)
+            self.parallaxManager.startBackGroundParallaxSmallStars(view: scene.view!, sprite: "smallStars", zPosition: -4)
+            self.parallaxManager.startBackGroundParallaxMediumSmall(view: scene.view!, sprite: "mediumSmallStars", zPosition: -3)
             
             //adds the luminito node
             self.luminito = SKSpriteNode(imageNamed: "Character Wow")
@@ -185,6 +185,9 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - SKSceneDelegate
     var second = 0
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
+        
+        self.parallaxManager.moveParallaxSmallStars(velocity: 4)
+        self.parallaxManager.moveParallaxSmallMedium(velocity: 12)
         
         if self.gameover == false {
             
