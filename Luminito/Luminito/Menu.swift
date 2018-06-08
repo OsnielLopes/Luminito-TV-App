@@ -47,4 +47,9 @@ class Menu: SKSpriteNode {
         gameScene.childNode(withName: "Store Button")?.run(moveStoreButtonToCenter)
     }
     
+    func playTapped(gameScene: SKScene){
+        let moveLuminitoToScene = SKAction.move(to: CGPoint(x: -(gameScene.size.width)/2.3, y: 0.0), duration: 1.0)
+        gameScene.childNode(withName: "Luminito")?.run(moveLuminitoToScene)
+    }
+    
 }

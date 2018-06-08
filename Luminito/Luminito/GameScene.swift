@@ -18,6 +18,7 @@ class GameScene: SKScene {
     var foreveLabel = SKSpriteNode(imageNamed: "Forever")
     var playButton = SKSpriteNode(imageNamed: "Menu Play Button")
     var storeButton = SKSpriteNode(imageNamed: "Store Button")
+    var luminito = SKSpriteNode(imageNamed: "Character Wow")
     
     override func didMove(to view: SKView) {
         
@@ -52,17 +53,29 @@ class GameScene: SKScene {
         self.addChild(foreveLabel)
         
         playButton.name = "Play Button"
+        playButton.focusBehavior = .focusable
         playButton.position = CGPoint(x: 1000.0, y: -50.0)
         playButton.size = CGSize(width: 140.0, height: 62.0)
         self.addChild(playButton)
         
         storeButton.name = "Store Button"
+        storeButton.focusBehavior = .focusable
         storeButton.position = CGPoint(x: 1000.0, y: -120.0)
         storeButton.size = CGSize(width: 140.0, height: 62.0)
         self.addChild(storeButton)
         
+        luminito.name = "Luminito"
+        luminito.position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
+        self.addChild(luminito)
+        
         let menu = Menu.init(gameScene: self)
         menu.moveMenuToCenter(gameScene: self)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
+            menu.moveMenuToLeftSide(gameScene: self)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+                menu.playTapped(gameScene: self)
+            })
+        })
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -77,13 +90,11 @@ class GameScene: SKScene {
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches {
-            
         }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches {
-            
         }
     }
     
