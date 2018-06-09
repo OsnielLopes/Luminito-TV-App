@@ -12,6 +12,8 @@ import GameplayKit
 
 class GameViewController: UIViewController {
 
+    var currentScene: SKScene?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -36,4 +38,5 @@ class GameViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Release any cached data, images, etc that aren't in use.
     }
+    
 }

@@ -14,11 +14,14 @@ class GameScene: SKScene {
     private var label : SKLabelNode?
     private var spinnyNode : SKShapeNode?
     
+    let menu = Menu()
     var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
     var foreveLabel = SKSpriteNode(imageNamed: "Forever")
-    var playButton = SKSpriteNode(imageNamed: "Menu Play Button")
-    var storeButton = SKSpriteNode(imageNamed: "Store Button")
+    var playButton = MenuButton(imageNamed: "Menu Play Button")
+    var storeButton = MenuButton(imageNamed: "Store Button")
     var luminito = SKSpriteNode(imageNamed: "Character Wow")
+    var buttons = [MenuButton]()
+    var playing = false
     
     override func didMove(to view: SKView) {
         
@@ -53,31 +56,35 @@ class GameScene: SKScene {
         self.addChild(foreveLabel)
         
         playButton.name = "Play Button"
-        playButton.focusBehavior = .focusable
         playButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * -0.10)
         playButton.size = CGSize(width: 140.0, height: 65.0)
+        playButton.isUserInteractionEnabled = true
+        buttons.append(playButton)
         self.addChild(playButton)
         
         storeButton.name = "Store Button"
-        storeButton.focusBehavior = .focusable
         storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * -0.25)
         storeButton.size = CGSize(width: 140.0, height: 65.0)
+        storeButton.isUserInteractionEnabled = true
+        buttons.append(storeButton)
         self.addChild(storeButton)
         
         luminito.name = "Luminito"
         luminito.position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
         self.addChild(luminito)
         
-        let menu = Menu.init(gameScene: self)
+        let menu = Menu(gameScene: self)
         menu.moveMenuToCenter(gameScene: self)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
-            menu.moveMenuToLeftSide(gameScene: self)
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
+//            menu.moveMenuToLeftSide(gameScene: self)
 //            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
 //                menu.playTapped(gameScene: self)
 //            })
-        })
-    
+//        })
+        
         addSelectRecognizer()
+        addMenuRecognizer()
+        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -109,15 +116,43 @@ class GameScene: SKScene {
         self.view?.addGestureRecognizer(selectRecognizer)
     }
     
-    @objc func buttonSelected(sender: AnyObject){
-        if(playButton.isFocused){
-            print("Play selected")
-        }else{
-            print("Store selected")
-        }
+    func addMenuRecognizer(){
+        let menuRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menuPressed(sender:)))
+        menuRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
+        self.view?.addGestureRecognizer(menuRecognizer)
     }
     
+    @objc func buttonSelected(sender: AnyObject){
+        if let focussedItem = UIScreen.main.focusedItem as? MenuButton {
+            if(focussedItem.name == "Play Button"){
+                print("Play selected")
+                menu.playTapped(gameScene: self)
+                playing = true
+            }else{
+                print("Store selected")
+            }
+        }
+        
+    }
     
-    
-    
+    @objc func menuPressed(sender: AnyObject){
+        if(playing == true){
+            menu.menuTapped(gameScene: self)
+        }else{
+            
+        }
+    }
+
+    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        let prevItem = context.previouslyFocusedItem
+        let nextItem = context.nextFocusedItem
+
+        if let prevButton = prevItem as? MenuButton {
+            prevButton.buttonDidLoseFocus()
+        }
+        if let nextButton = nextItem as? MenuButton {
+            nextButton.buttonDidGetFocus()
+        }
+    }
+
 }
