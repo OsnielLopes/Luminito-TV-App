@@ -21,10 +21,12 @@ class MenuButton: SKSpriteNode {
         }
     }
     
+    // Adiciona o foco no botão
     func buttonDidGetFocus() {
         self.scale(to: CGSize(width: 154.0, height: 71.5))
     }
     
+    // Retira o foco do botão
     func buttonDidLoseFocus() {
         self.scale(to: CGSize(width: 140.0, height: 65.0))
     }

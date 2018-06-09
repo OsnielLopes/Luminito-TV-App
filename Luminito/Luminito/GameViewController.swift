@@ -11,8 +11,6 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
-
-    var currentScene: SKScene?
     
     override func viewDidLoad() {
         super.viewDidLoad()

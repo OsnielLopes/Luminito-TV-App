@@ -11,9 +11,6 @@ import GameplayKit
 
 class GameScene: SKScene {
     
-    private var label : SKLabelNode?
-    private var spinnyNode : SKShapeNode?
-    
     let menu = Menu()
     var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
     var foreveLabel = SKSpriteNode(imageNamed: "Forever")
@@ -25,26 +22,7 @@ class GameScene: SKScene {
     
     override func didMove(to view: SKView) {
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
-        
-        // Create shape node to use during mouse interaction
-        let w = (self.size.width + self.size.height) * 0.05
-        self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-        
-        if let spinnyNode = self.spinnyNode {
-            spinnyNode.lineWidth = 2.5
-            
-            spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-            spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-                                              SKAction.fadeOut(withDuration: 0.5),
-                                              SKAction.removeFromParent()]))
-        }
-        
+        // Configurações iniciais
         luminitoLabel.name = "Luminito Label"
         luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.30)
         luminitoLabel.size = CGSize(width: 380.0, height: 115.0)
@@ -75,12 +53,6 @@ class GameScene: SKScene {
         
         let menu = Menu(gameScene: self)
         menu.moveMenuToCenter(gameScene: self)
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: {
-//            menu.moveMenuToLeftSide(gameScene: self)
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
-//                menu.playTapped(gameScene: self)
-//            })
-//        })
         
         addSelectRecognizer()
         addMenuRecognizer()
@@ -110,18 +82,21 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
     }
     
+    // Adiciona o recognizer de quando é dado um click do remote
     func addSelectRecognizer(){
         let selectRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.buttonSelected(sender:)))
         selectRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
         self.view?.addGestureRecognizer(selectRecognizer)
     }
     
+    // Adiciona o recognizer do botão menu do remote
     func addMenuRecognizer(){
         let menuRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menuPressed(sender:)))
         menuRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
         self.view?.addGestureRecognizer(menuRecognizer)
     }
     
+    // Executa quando é dado um click no remote
     @objc func buttonSelected(sender: AnyObject){
         if let focussedItem = UIScreen.main.focusedItem as? MenuButton {
             if(focussedItem.name == "Play Button"){
@@ -135,14 +110,16 @@ class GameScene: SKScene {
         
     }
     
+    // Executa quando o botão menu do remote é pressionado
     @objc func menuPressed(sender: AnyObject){
         if(playing == true){
             menu.menuTapped(gameScene: self)
         }else{
-            
+            //TODO: Go back to AppleTV menu screen
         }
     }
 
+    // Troca o botão focado
     override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
         let prevItem = context.previouslyFocusedItem
         let nextItem = context.nextFocusedItem

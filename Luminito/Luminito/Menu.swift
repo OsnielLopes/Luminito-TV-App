@@ -65,11 +65,12 @@ class Menu: SKSpriteNode {
         gameScene.childNode(withName: "Luminito")?.isUserInteractionEnabled = true
     }
     
+    // Animação do luminito saindo da scene e o menu voltando ao meio
     func menuTapped(gameScene: SKScene){
-        self.moveMenuToCenter(gameScene: gameScene)
         let moveLuminitoToLeft = SKAction.move(to: CGPoint(x: -(gameScene.size.width)/1.4, y: 0.0), duration: 1.0)
         gameScene.childNode(withName: "Luminito")?.run(moveLuminitoToLeft)
         gameScene.childNode(withName: "Luminito")?.isUserInteractionEnabled = false
+        self.moveMenuToCenter(gameScene: gameScene)
     }
     
 }
