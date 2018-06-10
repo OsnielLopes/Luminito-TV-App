@@ -177,10 +177,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             scene.enumerateChildNodes(withName: "electron") { (electron, stop) in
                 //If the electron is off the scene
-                if !((self.scene.view?.frame.contains(electron.position))!) {
+                if !((self.scene.view?.frame.contains(electron.position))!) && electron.position.x < self.scene.frame.width {
                     //Sets electron new position
                     let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-                    electron.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+                    electron.position = CGPoint(x: self.scene.frame.width + 10, y: CGFloat(yPos))
                 }
             }
         }
@@ -225,6 +225,14 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 })
                 
                 break
+                
+            case electronCategory:
+                energy += 10
+                self.scene.enumerateChildNodes(withName: "electro") { (node, stop) in
+                    //Sets electron new position
+                    let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+                    node.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+                }
             default:
                 break
             }
@@ -287,7 +295,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     private func addMeteors() {
         for _ in 0..<10{
-            //addMeteor()
+//            addMeteor()
         }
     }
     
@@ -336,7 +344,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         electronPhysicsBody.contactTestBitMask = luminitoCategory
         electronPhysicsBody.isDynamic = true
         electronPhysicsBody.linearDamping = 0
-        electronPhysicsBody.velocity = CGVector(dx: -100, dy: 0)
+        electronPhysicsBody.velocity = CGVector(dx: -400, dy: 0)
         electron.physicsBody = electronPhysicsBody
         
         self.scene.addChild(electron)
@@ -350,8 +358,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         let size: CGSize?
         let xVelocity = -(Int(arc4random_uniform(200))+200)
         
-        var type = Int(arc4random_uniform(2))
-        let randomNumber2 = Float(arc4random()) / Float(UInt32.max)
+        let type = Int(arc4random_uniform(2))
         
         if(type == 1){
             texture = SKTexture(imageNamed: "Asteroide Grande")
@@ -427,7 +434,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         restart.run(a3)
         
         //Game Over Label
-        var gameOverlabel = SKLabelNode(fontNamed: "Avenir")
+        let gameOverlabel = SKLabelNode(fontNamed: "Avenir")
         gameOverlabel.fontSize = 50
         gameOverlabel.fontColor = UIColor.yellow
         gameOverlabel.horizontalAlignmentMode = .center
