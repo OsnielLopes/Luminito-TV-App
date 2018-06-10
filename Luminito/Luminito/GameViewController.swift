@@ -231,11 +231,11 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 deltaTimeTemp = 0
             }
             
-            //Update calls it 60 times per second, so in one second is 5000 * 60 = 300.000  km (1s c)
+            //Update calls it aproximally 9 times per second, so in one second is 35000 * 9 =˜ 300.000  km (1s c)
             if self.colectible == .velocityBoost {
-                distance -= 15000
+                distance -= 105000
             } else {
-                distance -= 5000
+                distance -= 35000
             }
             
             deltaTime = 0.0
@@ -244,7 +244,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             deltaTimeTemp += deltaTime
         
         } else {
-            distance += 15000
+            //GameOver, return distance, there's some frames lost, so we have to increase distance amount per frame
+            //distance += 35000
         }
             
             scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
@@ -300,7 +301,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             case luminitoCategory:
                 //Luminito touched meteor and dies tragically
                 
-                self.gameover = true
                 self.gameOver()
 //
 //                for meteor in self.meteors {
@@ -568,6 +568,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
 //        let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
 //        gameOverlabel.run(a4)
         
+        self.gameover = true
+        
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity * -10, dy: 0)
         }
@@ -594,7 +596,11 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     @objc func stop() {
         self.gameover = false
         self.velocity /= -10
-        self.luminito?.physicsBody?.categoryBitMask = luminitoCategory
+        
+        self.luminito?.run(SKAction.wait(forDuration: 5), completion: {
+            self.luminito?.physicsBody?.categoryBitMask = self.luminitoCategory
+        })
+    
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
         }
