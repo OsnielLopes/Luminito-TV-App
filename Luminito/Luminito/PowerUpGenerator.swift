@@ -14,14 +14,28 @@ class PowerUpGenerator {
     //MARK: - Variables
     var timer = Timer()
     let gameViewController: GameViewController?
+    var powerUps: [Colectible] = [.intangibility,.intangibility,.velocityBoost,.velocityBoost,.velocityBoost]
+    var powerUpNames:[String] = ["ghost","ghost","boostVelocity","boostVelocity","boostVelocity"]
+    var randonGen = RandomGenerator()
     
     //MARK: - Initializer
     init(gameViewController: GameViewController) {
         self.gameViewController = gameViewController
     }
     
-    //MARK: - Power Up generators functions
-    func generateVelocityBoostPowerUp() {
+    //MARK: - Power Up generator
+    
+    func generatePowerUp() -> (colectible: Colectible, name: String) {
+        let ran = self.randonGen.generateRandomNumber(min: 0, max: self.powerUps.count - 1)
+        let colectible = self.powerUps[ran]
+        let name = self.powerUpNames[ran]
+        
+        let tuple = (colectible: colectible,name: name)
+        return tuple
+    }
+    
+    //MARK: - Power Up activate functions
+    func activateVelocityBoostPowerUp() {
         
         let meteors = self.gameViewController?.meteors
         for meteor in meteors! {
@@ -31,7 +45,7 @@ class PowerUpGenerator {
         self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
     }
     
-    func generateIntangibilityPowerUp() {
+    func activateIntangibilityPowerUp() {
         self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleLuminitoCategory)!
         self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
     }

@@ -61,6 +61,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let meteorCategory: UInt32 = 0x1 << 1
     let intangibleLuminitoCategory: UInt32 = 0x1 << 2
     let electronCategory: UInt32 = 0x1 << 3
+    let powerUpCategory: UInt32 = 0x1 << 4
+    
     var gameover = false
     var playing = true
     var luminitoInteraction = true
@@ -206,12 +208,16 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 
                 second += 1
                 
-                if second == 120 {
+                if second == 100 {
                     if parallaxManager.isNebulaInScreen == false {
                         guard let gameView = scene.view else {return}
-                        self.parallaxManager.startCelestialBody(view: gameView, sprite: "nebula", width: ((gameView.scene?.size.width)! * 6), height: ((gameView.scene?.size.height)! * 5.1), duration: 20, zPosition: -1)
-                      
+                        self.parallaxManager.startCelestialBody(view: gameView, sprite: "nebula", width: ((gameView.scene?.size.width)! * 6), height: ((gameView.scene?.size.height)! * 5.1), duration: 40, zPosition: -1)
                     }
+                } else if second == 200 {
+                    second = 0
+                } else if second == 5 {
+                    //Spawn PowerUp
+                    self.addPowerUp()
                 }
                 
                 deltaTimeTemp = 0
@@ -302,6 +308,17 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 break
             }
             
+        } else if wasTouched.categoryBitMask == powerUpCategory {
+            //Something touched PowerUp
+            
+            guard let powerUpsNames = self.powerUpGenerator?.powerUpNames else {return}
+            guard let powerUps = self.powerUpGenerator?.powerUps else {return}
+            
+            guard let i = powerUpsNames.index(of: (wasTouched.node?.name)!) else {return}
+            self.colectible = powerUps[i]
+            
+            wasTouched.node?.removeFromParent()
+            
         }
         
     }
@@ -324,16 +341,14 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     @objc func didTap(){
         
-        self.colectible = .intangibility
-        
         switch self.colectible {
         case .intangibility:
             
-            self.powerUpGenerator?.generateIntangibilityPowerUp()
+            self.powerUpGenerator?.activateIntangibilityPowerUp()
             print("Intangibility Engaged")
         case .velocityBoost:
             
-            self.powerUpGenerator?.generateVelocityBoostPowerUp()
+            self.powerUpGenerator?.activateVelocityBoostPowerUp()
             print("Velocity Engaged")
             
         case .meteorRepellent:
@@ -359,8 +374,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - Auxiliar Functions
     
     private func addMeteors() {
-        for _ in 0..<10{
-            //addMeteor()
+        for _ in 0..<5{
+            addMeteor()
         }
     }
     
@@ -416,6 +431,31 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         //        electron.physicsBody?.velocity = CGVector(dx: -100, dy: 0)
     }
+    
+    func addPowerUp() {
+        let tuple = self.powerUpGenerator?.generatePowerUp()
+        self.colectible = (tuple?.colectible)!
+        
+        //Add movement and physics
+        let powerUp = SKSpriteNode(imageNamed: (tuple?.name)!)
+        powerUp.name = tuple?.name
+        powerUp.size = CGSize(width: powerUp.size.width * 0.4, height: powerUp.size.height * 0.4)
+        let y = self.randomGen.generateRandomNumber(min: 0, max: Int(self.scene.frame.height))
+        powerUp.position = CGPoint(x: Int(self.scene.frame.width), y: y)
+        let action = SKAction.move(to: CGPoint(x: -powerUp.size.width, y: CGFloat(y)), duration: 20)
+        
+        let powerUpPhysicsBody = SKPhysicsBody(texture: powerUp.texture!, size: powerUp.size)
+        powerUpPhysicsBody.categoryBitMask = powerUpCategory
+        powerUpPhysicsBody.collisionBitMask = luminitoCategory
+        powerUpPhysicsBody.contactTestBitMask = luminitoCategory
+        powerUpPhysicsBody.isDynamic = true
+        
+        powerUp.physicsBody = powerUpPhysicsBody
+
+        self.scene.addChild(powerUp)
+        powerUp.run(action)
+    }
+   
     
     func createRandomMeteor() -> SKMeteorNode {
         
