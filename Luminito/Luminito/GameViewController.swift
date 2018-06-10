@@ -52,10 +52,18 @@ struct Planets {
 class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDelegate {
     
     //MARK: - Luminito
-    var luminito: SKSpriteNode?
+    var luminito = SKSpriteNode(imageNamed: "Character Wow")
     
     //MARK: - Variables
     var scene: SKScene!
+    
+    let menu = Menu()
+    var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
+    var foreveLabel = SKSpriteNode(imageNamed: "Forever")
+    var playButton = MenuButton(imageNamed: "Menu Play Button")
+    var storeButton = MenuButton(imageNamed: "Store Button")
+    var buttons = [MenuButton]()
+    
     var colectible: Colectible = .intangibility
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
@@ -156,17 +164,49 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             self.parallaxManager.startBackGroundParallaxSmallStars(view: scene.view!, sprite: "smallStars", zPosition: -4)
             self.parallaxManager.startBackGroundParallaxMediumSmall(view: scene.view!, sprite: "mediumSmallStars", zPosition: -3)
             
+            //Set menu
+            luminitoLabel.name = "Luminito Label"
+            luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.30)
+            luminitoLabel.size = CGSize(width: 380.0, height: 115.0)
+            self.scene.addChild(luminitoLabel)
+            
+            foreveLabel.name = "Forever Label"
+            foreveLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.12)
+            foreveLabel.size = CGSize(width: 250.0, height: 100.0)
+            self.scene.addChild(foreveLabel)
+            
+            playButton.name = "Play Button"
+            playButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * -0.10)
+            playButton.size = CGSize(width: 140.0, height: 65.0)
+            playButton.isUserInteractionEnabled = true
+            buttons.append(playButton)
+            self.scene.addChild(playButton)
+            
+            storeButton.name = "Store Button"
+            storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * -0.25)
+            storeButton.size = CGSize(width: 140.0, height: 65.0)
+            storeButton.isUserInteractionEnabled = true
+            buttons.append(storeButton)
+            self.scene.addChild(storeButton)
+            
+            let menu = Menu(gameScene: self.scene)
+            menu.moveMenuToCenter(gameScene: self.scene)
+            
+            //addSelectRecognizer()
+            //addMenuRecognizer()
+            
+            
             //adds the luminito node
-            self.luminito = SKSpriteNode(imageNamed: "Character Wow")
-            let position = CGPoint(x: self.scene.frame.width*0.1, y: self.scene.frame.height*0.5)
-            luminito?.position = position
-            let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: (luminito?.size)!)
+            luminito.name = "Luminito"
+            let position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
+            luminito.position = position
+            let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: CGSize(width: 150.0, height: 150.0))
             luminitoPhysicsBody.categoryBitMask = luminitoCategory
             luminitoPhysicsBody.collisionBitMask = meteorCategory
             
             luminitoPhysicsBody.isDynamic = false
-            luminito?.physicsBody = luminitoPhysicsBody
-            self.scene.addChild(luminito!)
+            luminito.physicsBody = luminitoPhysicsBody
+            self.scene.addChild(luminito)
             
             addMeteors()
             addElectron()
@@ -353,7 +393,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             let pos = touch.location(in: self.scene)
             
             
-            luminito?.position.y = pos.y
+            luminito.position.y = pos.y
             
             
         }
@@ -574,7 +614,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity * -10, dy: 0)
         }
         
-        self.luminito?.physicsBody?.categoryBitMask = intangibleLuminitoCategory
+        self.luminito.physicsBody?.categoryBitMask = intangibleLuminitoCategory
         self.velocity *= -10
         
         self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
@@ -597,8 +637,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.gameover = false
         self.velocity /= -10
         
-        self.luminito?.run(SKAction.wait(forDuration: 5), completion: {
-            self.luminito?.physicsBody?.categoryBitMask = self.luminitoCategory
+        self.luminito.run(SKAction.wait(forDuration: 5), completion: {
+            self.luminito.physicsBody?.categoryBitMask = self.luminitoCategory
         })
     
         for meteor in self.meteors {
@@ -633,5 +673,56 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         playing = false
         luminitoInteraction = false
     }
+    
+    // Adiciona o recognizer de quando é dado um click do remote
+    func addSelectRecognizer(){
+        let selectRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.buttonSelected(sender:)))
+        selectRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+        self.view?.addGestureRecognizer(selectRecognizer)
+    }
+    
+    // Adiciona o recognizer do botão menu do remote
+    func addMenuRecognizer(){
+        let menuRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menuPressed(sender:)))
+        menuRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
+        self.view?.addGestureRecognizer(menuRecognizer)
+    }
+    
+    // Executa quando é dado um click no remote
+    @objc func buttonSelected(sender: AnyObject){
+        if let focussedItem = UIScreen.main.focusedItem as? MenuButton {
+            if(focussedItem.name == "Play Button"){
+                print("Play selected")
+                menu.playTapped(gameScene: self.scene)
+                playing = true
+            }else{
+                print("Store selected")
+            }
+        }
+        
+    }
+    
+    // Executa quando o botão menu do remote é pressionado
+    @objc func menuPressed(sender: AnyObject){
+        if(playing == true){
+            menu.menuTapped(gameScene: self.scene)
+        }else{
+            //TODO: Go back to AppleTV menu screen
+        }
+    }
+    
+    // Troca o botão focado
+    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        let prevItem = context.previouslyFocusedItem
+        let nextItem = context.nextFocusedItem
+        
+        if let prevButton = prevItem as? MenuButton {
+            prevButton.buttonDidLoseFocus()
+        }
+        if let nextButton = nextItem as? MenuButton {
+            nextButton.buttonDidGetFocus()
+        }
+    }
+
 }
 
