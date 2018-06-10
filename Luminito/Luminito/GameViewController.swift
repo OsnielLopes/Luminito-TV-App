@@ -62,6 +62,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let intangibleLuminitoCategory: UInt32 = 0x1 << 2
     let electronCategory: UInt32 = 0x1 << 3
     let powerUpCategory: UInt32 = 0x1 << 4
+    var timer = Timer()
+    
+    var second = 0
+    var velocity = CGFloat(1)
     
     var gameover = false
     var playing = true
@@ -72,6 +76,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var randomGen = RandomGenerator()
     var parallaxManager = ParallaxManager()
     var planetsArray: [Planets] = []
+
     
     //MARK: - Managers
     var powerUpGenerator: PowerUpGenerator?
@@ -183,13 +188,12 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         // Release any cached data, images, etc that aren't in use.
     }
     
-    
+    var powerUpTime = 0
     //MARK: - SKSceneDelegate
-    var second = 0
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         
-        self.parallaxManager.moveParallaxSmallStars(velocity: 4)
-        self.parallaxManager.moveParallaxSmallMedium(velocity: 12)
+        self.parallaxManager.moveParallaxSmallStars(velocity: self.velocity)
+        self.parallaxManager.moveParallaxSmallMedium(velocity: self.velocity * 3)
         
         if self.gameover == false {
             
@@ -207,17 +211,21 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 //self.distance -= 300000
                 
                 second += 1
+                powerUpTime += 1
                 
-                if second == 100 {
+                if second == 30 {
                     if parallaxManager.isNebulaInScreen == false {
                         guard let gameView = scene.view else {return}
                         self.parallaxManager.startCelestialBody(view: gameView, sprite: "nebula", width: ((gameView.scene?.size.width)! * 6), height: ((gameView.scene?.size.height)! * 5.1), duration: 40, zPosition: -1)
                     }
-                } else if second == 200 {
+                } else if second == 150 {
                     second = 0
-                } else if second == 5 {
+                }
+                
+                if powerUpTime == 20 {
                     //Spawn PowerUp
                     self.addPowerUp()
+                    powerUpTime = 0
                 }
                 
                 deltaTimeTemp = 0
@@ -234,6 +242,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             deltaTime = currentTime - lastTime
             lastTime = currentTime
             deltaTimeTemp += deltaTime
+        
+        } else {
+            distance += 15000
+        }
             
             scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
                 guard let meteor = node as? SKMeteorNode else {
@@ -246,12 +258,18 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                     
                     //Sets meteor new position
                     let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-                    meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+                    
+                    if self.gameover {
+                        meteor.position = CGPoint(x: 0, y: CGFloat(yPos))
+                    } else {
+                        meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+                    }
                 }
                 
                 if self.colectible == .none {
                     meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
                 }
+                
             }
             
             scene.enumerateChildNodes(withName: "electron") { (electron, stop) in
@@ -262,7 +280,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                     electron.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
                 }
             }
-        }
+        //}
     }
     
     //MARK: - ContactDelegate
@@ -283,25 +301,28 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 //Luminito touched meteor and dies tragically
                 
                 self.gameover = true
+                self.gameOver()
+//
+//                for meteor in self.meteors {
+//                    meteor.physicsBody = nil
+//                }
+//
+//                whoTouch.categoryBitMask = intangibleLuminitoCategory
+//                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
+//                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
+//                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
+//
+//                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
+//
+//                let seq = [a1,a2,a3]
+//                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
+//
+//                    whoTouch.node?.run(a4, completion: {
+//                        self.gameOver()
+//                    })
+//                })
                 
-                for meteor in self.meteors {
-                    meteor.physicsBody = nil
-                }
                 
-                whoTouch.categoryBitMask = intangibleLuminitoCategory
-                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
-                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-                
-                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
-                
-                let seq = [a1,a2,a3]
-                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
-                    
-                    whoTouch.node?.run(a4, completion: {
-                        self.gameOver()
-                    })
-                })
                 
                 break
             default:
@@ -341,26 +362,29 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     @objc func didTap(){
         
-        switch self.colectible {
-        case .intangibility:
-            
-            self.powerUpGenerator?.activateIntangibilityPowerUp()
-            print("Intangibility Engaged")
-        case .velocityBoost:
-            
-            self.powerUpGenerator?.activateVelocityBoostPowerUp()
-            print("Velocity Engaged")
-            
-        case .meteorRepellent:
-            print("not allowed yet")
-        case .meteorDestroyer:
-            print("not allowed yet")
-        case .magnet:
-            print("not allowed yet")
-        case .oneMoreLife:
-            print("not allowed yet")
-        case .none:
-            print("powerUps disabled")
+        if self.gameover == false {
+            switch self.colectible {
+            case .intangibility:
+                
+                self.powerUpGenerator?.activateIntangibilityPowerUp()
+                print("Intangibility Engaged")
+                
+            case .velocityBoost:
+                
+                self.powerUpGenerator?.activateVelocityBoostPowerUp()
+                print("Velocity Engaged")
+                
+            case .meteorRepellent:
+                print("not allowed yet")
+            case .meteorDestroyer:
+                print("not allowed yet")
+            case .magnet:
+                print("not allowed yet")
+            case .oneMoreLife:
+                print("not allowed yet")
+            case .none:
+                print("powerUps disabled")
+            }
         }
         
         self.scene.enumerateChildNodes(withName: "meteor") { (node, end) in
@@ -372,7 +396,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     }
     
     //MARK: - Auxiliar Functions
-    
     private func addMeteors() {
         for _ in 0..<5{
             addMeteor()
@@ -461,17 +484,20 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         let texture: SKTexture?
         let size: CGSize?
-        let xVelocity = -(Int(arc4random_uniform(200))+200)
+        let xVelocity = -(Int(arc4random_uniform(100))+100)
         
-        var type = Int(arc4random_uniform(2))
+        var type = Int(arc4random_uniform(4))
         let randomNumber2 = Float(arc4random()) / Float(UInt32.max)
         
         if(type == 1){
             texture = SKTexture(imageNamed: "Asteroide Grande")
-            size = CGSize(width: 50, height: 50)
+            size = CGSize(width: 100, height: 100)
+        }else if(type == 2){
+            texture = SKTexture(imageNamed: "Asteroide Grande")
+            size = CGSize(width: 60, height: 60)
         }else{
             texture = SKTexture(imageNamed: "Asteroide Pequeno")
-            size = CGSize(width: 30, height: 30)
+            size = CGSize(width: 40, height: 40)
         }
         
         let meteor = SKMeteorNode(texture: texture!, initialVelocity: xVelocity, size: size!)
@@ -501,78 +527,77 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     }
     
     func gameOver(){
-        //FIXME: - Low FPS when put Blur effect
-        
-        //                let  blur = CIFilter(name:"CIGaussianBlur",withInputParameters: ["inputRadius": 10.0])
-        //                self.scene.filter = blur
-        //                self.scene.shouldRasterize = true
-        //                self.scene.shouldEnableEffects = true
-        
-        
-        // Create an effects node with blur
-        //        let effectsNode = SKEffectNode()
-        //        let filter = CIFilter(name: "CIGaussianBlur")
-        //        // Set the blur amount. Adjust this to achieve the desired effect
-        //        let blurAmount = 10.0
-        //        filter?.setValue(blurAmount, forKey: kCIInputRadiusKey)
-        //
-        //        effectsNode.filter = filter
-        //        effectsNode.position = CGPoint(x: 0, y: 0)
-        //        effectsNode.blendMode = .alpha
-        
-        // Add the sprite to effects node to the sprite be blurred
-        //        let nodes = self.scene.children
-        //        self.scene.removeAllChildren()
-        //        for node in nodes {
-        //            self.gameover = true
-        //            node.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        //            node.physicsBody = nil
-        //            effectsNode.addChild(node)
-        //        }
-        //        self.scene.addChild(effectsNode)
-        
-        //Not blurred
         
         //Luminito Sad
-        let sprite = SKSpriteNode(imageNamed: "Character Sad")
-        sprite.position = CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 1.5)
-        sprite.size = CGSize(width: self.scene.size.width * 0.3 , height: self.scene.size.width * 0.3);
-        sprite.zPosition = 100
-        self.scene.addChild(sprite)
-        let a = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.65), duration: 2)
-        sprite.run(a)
+//        let sprite = SKSpriteNode(imageNamed: "Character Sad")
+//        sprite.position = CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 1.5)
+//        sprite.size = CGSize(width: self.scene.size.width * 0.3 , height: self.scene.size.width * 0.3);
+//        sprite.zPosition = 100
+//        self.scene.addChild(sprite)
+//        let a = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.65), duration: 2)
+//        sprite.run(a)
+//
+//        //Home
+//        let home = SKSpriteNode(imageNamed: "Home Button")
+//        home.position = CGPoint(x: -(self.scene.size.width * 0.1), y: self.scene.size.height * 0.25)
+//        home.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
+//        home.zPosition = 100
+//        self.scene.addChild(home)
+//        let a2 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.45, y: self.scene.size.height * 0.25), duration: 0.3)
+//        home.run(a2)
+//
+//        //Restart CheckPoint
+//        let restart = SKSpriteNode(imageNamed: "Home Button")
+//        restart.position = CGPoint(x: (self.scene.size.width * 1.1), y: self.scene.size.height * 0.25)
+//        restart.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
+//        restart.zPosition = 100
+//        self.scene.addChild(restart)
+//        let a3 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.55, y: self.scene.size.height * 0.25), duration: 0.3)
+//        restart.run(a3)
+//
+//        //Game Over Label
+//        var gameOverlabel = SKLabelNode(fontNamed: "Avenir")
+//        gameOverlabel.fontSize = 50
+//        gameOverlabel.fontColor = UIColor.yellow
+//        gameOverlabel.horizontalAlignmentMode = .center
+//        gameOverlabel.verticalAlignmentMode = .bottom
+//        gameOverlabel.text = "GameOver"
+//        gameOverlabel.position = CGPoint(x: self.scene.size.width * 0.5, y: -(self.scene.size.height * 0.1))
+//        gameOverlabel.zPosition = 100
+//        self.scene.addChild(gameOverlabel)
+//        let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
+//        gameOverlabel.run(a4)
         
-        //Home
-        let home = SKSpriteNode(imageNamed: "Home Button")
-        home.position = CGPoint(x: -(self.scene.size.width * 0.1), y: self.scene.size.height * 0.25)
-        home.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
-        home.zPosition = 100
-        self.scene.addChild(home)
-        let a2 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.45, y: self.scene.size.height * 0.25), duration: 0.3)
-        home.run(a2)
+        for meteor in self.meteors {
+            meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity * -10, dy: 0)
+        }
         
-        //Restart CheckPoint
-        let restart = SKSpriteNode(imageNamed: "Home Button")
-        restart.position = CGPoint(x: (self.scene.size.width * 1.1), y: self.scene.size.height * 0.25)
-        restart.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
-        restart.zPosition = 100
-        self.scene.addChild(restart)
-        let a3 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.55, y: self.scene.size.height * 0.25), duration: 0.3)
-        restart.run(a3)
+        self.luminito?.physicsBody?.categoryBitMask = intangibleLuminitoCategory
+        self.velocity *= -10
         
-        //Game Over Label
-        var gameOverlabel = SKLabelNode(fontNamed: "Avenir")
-        gameOverlabel.fontSize = 50
-        gameOverlabel.fontColor = UIColor.yellow
-        gameOverlabel.horizontalAlignmentMode = .center
-        gameOverlabel.verticalAlignmentMode = .bottom
-        gameOverlabel.text = "GameOver"
-        gameOverlabel.position = CGPoint(x: self.scene.size.width * 0.5, y: -(self.scene.size.height * 0.1))
-        gameOverlabel.zPosition = 100
-        self.scene.addChild(gameOverlabel)
-        let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
-        gameOverlabel.run(a4)
+        self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
         
+        if self.parallaxManager.isNebulaInScreen == true {
+            self.scene.enumerateChildNodes(withName: "nebula") { (node, end) in
+                guard let nebula = node as? SKSpriteNode else {
+                    return
+                }
+                
+                nebula.run(SKAction.fadeOut(withDuration: 1), completion: {
+                    nebula.removeFromParent()
+                })
+            }
+        }
+        
+    }
+    
+    @objc func stop() {
+        self.gameover = false
+        self.velocity /= -10
+        self.luminito?.physicsBody?.categoryBitMask = luminitoCategory
+        for meteor in self.meteors {
+            meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
+        }
     }
     
     func addTapGestureRecognizer() {

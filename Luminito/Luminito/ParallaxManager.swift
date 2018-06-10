@@ -64,25 +64,52 @@ class ParallaxManager {
         self.bg?.position = CGPoint(x: (bg?.position.x)! - velocity, y: (bg?.position.y)!)
         self.bg1?.position = CGPoint(x: (bg1?.position.x)! - velocity, y: (bg1?.position.y)!)
 
-        if ((bg?.position.x)! < (-0.5 * (bg?.size.width)!)) {
-            bg?.position = CGPoint(x: (bg1?.position.x)! + (bg1?.size.width)!, y: (bg?.position.y)!)
+        
+        if velocity < 0 {
+            if ((bg?.position.x)! > (1.5 * (bg?.size.width)!)) {
+                bg?.position = CGPoint(x: (bg1?.position.x)! - (bg1?.size.width)!, y: (bg?.position.y)!)
+            }
+            
+            if ((bg1?.position.x)! > (1.5 * (bg1?.size.width)!)) {
+                bg1?.position = CGPoint(x: (bg?.position.x)! - (bg?.size.width)!, y: (bg1?.position.y)!)
+            }
+        } else {
+            if ((bg?.position.x)! < (-0.5 * (bg?.size.width)!)) {
+                bg?.position = CGPoint(x: (bg1?.position.x)! + (bg1?.size.width)!, y: (bg?.position.y)!)
+            }
+            
+            if ((bg1?.position.x)! < (-0.5 * (bg1?.size.width)!)) {
+                bg1?.position = CGPoint(x: (bg?.position.x)! + (bg?.size.width)!, y: (bg1?.position.y)!)
+            }
         }
-
-        if ((bg1?.position.x)! < (-0.5 * (bg1?.size.width)!)) {
-            bg1?.position = CGPoint(x: (bg?.position.x)! + (bg?.size.width)!, y: (bg1?.position.y)!)
-        }
+        
     }
     
     func moveParallaxSmallMedium(velocity: CGFloat) {
+        
         self.bg2?.position = CGPoint(x: (bg2?.position.x)! - velocity, y: (bg2?.position.y)!)
         self.bg3?.position = CGPoint(x: (bg3?.position.x)! - velocity, y: (bg3?.position.y)!)
         
-        if ((bg2?.position.x)! < (-0.5 * (bg2?.size.width)!)) {
-            bg2?.position = CGPoint(x: (bg3?.position.x)! + (bg3?.size.width)!, y: (bg2?.position.y)!)
-        }
         
-        if ((bg3?.position.x)! < (-0.5 * (bg3?.size.width)!)) {
-            bg3?.position = CGPoint(x: (bg2?.position.x)! + (bg2?.size.width)!, y: (bg3?.position.y)!)
+        if velocity < 0 {
+            
+            if ((bg2?.position.x)! > (1.5 * (bg2?.size.width)!)) {
+                
+                bg2?.position = CGPoint(x: (bg3?.position.x)! - (bg3?.size.width)!, y: (bg2?.position.y)!)
+            }
+            
+            if ((bg3?.position.x)! > (1.5 * (bg3?.size.width)!)) {
+                bg3?.position = CGPoint(x: (bg2?.position.x)! - (bg2?.size.width)!, y: (bg3?.position.y)!)
+            }
+            
+        } else {
+            if ((bg2?.position.x)! < (-0.5 * (bg2?.size.width)!)) {
+                bg2?.position = CGPoint(x: (bg3?.position.x)! + (bg3?.size.width)!, y: (bg2?.position.y)!)
+            }
+            
+            if ((bg3?.position.x)! < (-0.5 * (bg3?.size.width)!)) {
+                bg3?.position = CGPoint(x: (bg2?.position.x)! + (bg2?.size.width)!, y: (bg3?.position.y)!)
+            }
         }
     }
     
@@ -103,6 +130,7 @@ class ParallaxManager {
     func startNebula(view: SKView, sprite: String, width: CGFloat, height: CGFloat, duration: TimeInterval, zPosition: CGFloat) {
         
         let body = SKSpriteNode(imageNamed: sprite)
+        body.name = "nebula"
         body.size = CGSize(width: width, height: height)
         body.position = CGPoint(x: (((view.scene?.size.width)! * 0.5) + (width * 0.5)), y: 0)
         view.scene?.addChild(body)
