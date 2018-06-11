@@ -166,35 +166,28 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             //Set menu
             luminitoLabel.name = "Luminito Label"
-            luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.30)
+            luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.80)
             luminitoLabel.size = CGSize(width: 380.0, height: 115.0)
             self.scene.addChild(luminitoLabel)
             
             foreveLabel.name = "Forever Label"
-            foreveLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.12)
+            foreveLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.62)
             foreveLabel.size = CGSize(width: 250.0, height: 100.0)
             self.scene.addChild(foreveLabel)
             
             playButton.name = "Play Button"
-            playButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * -0.10)
+            playButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.40)
             playButton.size = CGSize(width: 140.0, height: 65.0)
             playButton.isUserInteractionEnabled = true
             buttons.append(playButton)
             self.scene.addChild(playButton)
             
             storeButton.name = "Store Button"
-            storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * -0.25)
+            storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.25)
             storeButton.size = CGSize(width: 140.0, height: 65.0)
             storeButton.isUserInteractionEnabled = true
             buttons.append(storeButton)
             self.scene.addChild(storeButton)
-            
-            let menu = Menu(gameScene: self.scene)
-            menu.moveMenuToCenter(gameScene: self.scene)
-            
-            //addSelectRecognizer()
-            //addMenuRecognizer()
-            
             
             //adds the luminito node
             luminito.name = "Luminito"
@@ -207,6 +200,19 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             luminitoPhysicsBody.isDynamic = false
             luminito.physicsBody = luminitoPhysicsBody
             self.scene.addChild(luminito)
+            
+            let menu = Menu(gameScene: self.scene)
+            menu.moveMenuToCenter(gameScene: self.scene)
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                menu.playTapped(gameScene: self.scene)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                    menu.menuTapped(gameScene: self.scene)
+                })
+            })
+            
+            //addSelectRecognizer()
+            //addMenuRecognizer()
             
             addMeteors()
             addElectron()
