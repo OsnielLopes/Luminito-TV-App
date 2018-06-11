@@ -76,7 +76,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var randomGen = RandomGenerator()
     var parallaxManager = ParallaxManager()
     var planetsArray: [Planets] = []
-
+    
     
     //MARK: - Managers
     var powerUpGenerator: PowerUpGenerator?
@@ -85,6 +85,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var meteors:[SKMeteorNode] = []
     var backgrounds:[SKSpriteNode] = []
     
+    //HUDs
     lazy var distanceLabel: SKLabelNode = {
         var label = SKLabelNode(fontNamed: "Avenir")
         label.fontSize = 36
@@ -109,17 +110,19 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         var label = SKLabelNode(fontNamed: "Avenir")
         label.fontSize = 36
         label.fontColor = UIColor.yellow
-        label.horizontalAlignmentMode = .right
+        label.horizontalAlignmentMode = .left
         label.verticalAlignmentMode = .bottom
-
         label.text = "0 N"
-        
         return label
     }()
     
-    var energy: Int = 0 {
+    var energyIndicatorBackgorund: SKShapeNode!
+    var energyIndicator: SKShapeNode!
+    
+    var energy: Int = 90 {
         didSet {
             self.energyLabel.text = "\(energy) N"
+                self.redrawEnergyIndicator()
         }
     }
     
@@ -174,12 +177,21 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             //add HUD
             self.distanceLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
             self.scene.addChild(self.distanceLabel)
-            self.energyLabel.position = CGPoint(x: (self.scene.frame.width * 0.85) - self.energyLabel.frame.width, y: self.scene.frame.height * 0.95)
+            self.energyLabel.position = CGPoint(x: (self.scene.frame.width * 0.95) - (self.energyLabel.frame.width/2), y: self.scene.frame.height * 0.95)
             self.scene.addChild(self.energyLabel)
+            let rect = CGRect(x: 0, y: 0, width: self.scene.frame.width*0.2, height: self.scene.frame.height*0.03)
+            self.energyIndicatorBackgorund = SKShapeNode(rect: rect, cornerRadius: 10)
+            energyIndicatorBackgorund.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.95)
+            self.scene.addChild(energyIndicatorBackgorund)
             
             //add the tap recognizer
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
             view.addGestureRecognizer(tapRecognizer)
+            
+            //add the swipe recognizer
+            let swipeGestureRocognizer = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe))
+            swipeGestureRocognizer.direction = .right
+            view.addGestureRecognizer(swipeGestureRocognizer)
         }
     }
     
@@ -242,45 +254,46 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             deltaTime = currentTime - lastTime
             lastTime = currentTime
             deltaTimeTemp += deltaTime
-        
+            
         } else {
             //GameOver, return distance, there's some frames lost, so we have to increase distance amount per frame
             //distance += 35000
         }
-            
-            scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
-                guard let meteor = node as? SKMeteorNode else {
-                    print("Impossible to convert the node to a SKMeteorNode")
-                    return
-                }
-                
-                //If meteor is off the Scene
-                if !((self.scene.view?.frame.contains(meteor.position))!) {
-                    
-                    //Sets meteor new position
-                    let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-                    
-                    if self.gameover {
-                        meteor.position = CGPoint(x: 0, y: CGFloat(yPos))
-                    } else {
-                        meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
-                    }
-                }
-                
-                if self.colectible == .none {
-                    meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
-                }
-                
+        
+        scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
+            guard let meteor = node as? SKMeteorNode else {
+                print("Impossible to convert the node to a SKMeteorNode")
+                return
             }
             
-            scene.enumerateChildNodes(withName: "electron") { (electron, stop) in
-                //If the electron is off the scene
-                if !((self.scene.view?.frame.contains(electron.position))!) && electron.position.x < self.scene.frame.width {
-                    //Sets electron new position
-                    let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-                    electron.position = CGPoint(x: self.scene.frame.width + 10, y: CGFloat(yPos))
+            //If meteor is off the Scene
+            if !((self.scene.view?.frame.contains(meteor.position))!) {
+                
+                //Sets meteor new position
+                let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+                
+                if self.gameover {
+                    meteor.position = CGPoint(x: 0, y: CGFloat(yPos))
+                } else {
+                    meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
                 }
             }
+            
+            if self.colectible == .none {
+                meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
+            }
+            
+        }
+        
+        scene.enumerateChildNodes(withName: "electron") { (electron, stop) in
+            //If the electron is off the scene
+            if !((self.scene.view?.frame.contains(electron.position))!) && electron.position.x < self.scene.frame.width {
+                //Sets electron new position
+                let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+                electron.position = CGPoint(x: self.scene.frame.width + 10, y: CGFloat(yPos))
+                electron.physicsBody?.velocity = CGVector(dx: -100, dy: 0)
+            }
+        }
         //}
     }
     
@@ -302,37 +315,29 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 //Luminito touched meteor and dies tragically
                 
                 self.gameOver()
-//
-//                for meteor in self.meteors {
-//                    meteor.physicsBody = nil
-//                }
-//
-//                whoTouch.categoryBitMask = intangibleLuminitoCategory
-//                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-//                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
-//                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-//
-//                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
-//
-//                let seq = [a1,a2,a3]
-//                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
-//
-//                    whoTouch.node?.run(a4, completion: {
-//                        self.gameOver()
-//                    })
-//                })
+                //
+                //                for meteor in self.meteors {
+                //                    meteor.physicsBody = nil
+                //                }
+                //
+                //                whoTouch.categoryBitMask = intangibleLuminitoCategory
+                //                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
+                //                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
+                //                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
+                //
+                //                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
+                //
+                //                let seq = [a1,a2,a3]
+                //                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
+                //
+                //                    whoTouch.node?.run(a4, completion: {
+                //                        self.gameOver()
+                //                    })
+                //                })
                 
                 
                 
                 break
-                
-            case electronCategory:
-                energy += 10
-                self.scene.enumerateChildNodes(withName: "electro") { (node, stop) in
-                    //Sets electron new position
-                    let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-                    node.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
-                }
             default:
                 break
             }
@@ -348,24 +353,21 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             wasTouched.node?.removeFromParent()
             
+        } else if wasTouched.categoryBitMask == electronCategory {
+            wasTouched.node?.removeFromParent()
+            self.addElectron(increasingEnergy: true)
         }
         
     }
     
+    
     //MARK: - Gesture Recognition
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
         for touch in touches {
-            
             let pos = touch.location(in: self.scene)
-            
-            
             luminito?.position.y = pos.y
-            
-            
         }
-        
     }
     
     @objc func didTap(){
@@ -403,10 +405,16 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
     }
     
+    @objc func didSwipe() {
+        if energy == 100 {
+            energy = 0
+        }
+    }
+    
     //MARK: - Auxiliar Functions
     private func addMeteors() {
         for _ in 0..<10{
-//            addMeteor()
+            //            addMeteor()
         }
     }
     
@@ -441,26 +449,30 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         //        }
     }
     
-    func addElectron() {
+    func addElectron(increasingEnergy: Bool = false) {
         
-        let electron = SKSpriteNode(imageNamed: "electron")
-        electron.size = CGSize(width: electron.size.width*0.1, height: electron.size.height*0.1)
-        electron.name = "electron"
-        let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
-        electron.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+        if nil == self.scene.childNode(withName: "electron") {
+            
+            self.energy += increasingEnergy && energy < 100 ? 10 : 0
+            
+            let electron = SKSpriteNode(imageNamed: "electron")
+            electron.size = CGSize(width: electron.size.width*0.1, height: electron.size.height*0.1)
+            electron.name = "electron"
+            let yPos = arc4random_uniform(UInt32(self.scene.frame.height))
+            electron.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
+            
+            let electronPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "electron"), size: electron.size)
+            electronPhysicsBody.categoryBitMask = electronCategory
+            electronPhysicsBody.collisionBitMask = luminitoCategory
+            electronPhysicsBody.contactTestBitMask = luminitoCategory
+            electronPhysicsBody.isDynamic = true
+            electronPhysicsBody.linearDamping = 0
+            electronPhysicsBody.velocity = CGVector(dx: -100, dy: 0)
+            electron.physicsBody = electronPhysicsBody
+            
+            self.scene.addChild(electron)
+        }
         
-        let electronPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "electron"), size: electron.size)
-        electronPhysicsBody.categoryBitMask = electronCategory
-        electronPhysicsBody.collisionBitMask = luminitoCategory
-        electronPhysicsBody.contactTestBitMask = luminitoCategory
-        electronPhysicsBody.isDynamic = true
-        electronPhysicsBody.linearDamping = 0
-        electronPhysicsBody.velocity = CGVector(dx: -400, dy: 0)
-        electron.physicsBody = electronPhysicsBody
-        
-        self.scene.addChild(electron)
-        
-        //        electron.physicsBody?.velocity = CGVector(dx: -100, dy: 0)
     }
     
     func addPowerUp() {
@@ -482,11 +494,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         powerUpPhysicsBody.isDynamic = true
         
         powerUp.physicsBody = powerUpPhysicsBody
-
+        
         self.scene.addChild(powerUp)
         powerUp.run(action)
     }
-   
     
     func createRandomMeteor() -> SKMeteorNode {
         
@@ -536,44 +547,44 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     func gameOver(){
         
         //Luminito Sad
-//        let sprite = SKSpriteNode(imageNamed: "Character Sad")
-//        sprite.position = CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 1.5)
-//        sprite.size = CGSize(width: self.scene.size.width * 0.3 , height: self.scene.size.width * 0.3);
-//        sprite.zPosition = 100
-//        self.scene.addChild(sprite)
-//        let a = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.65), duration: 2)
-//        sprite.run(a)
-//
-//        //Home
-//        let home = SKSpriteNode(imageNamed: "Home Button")
-//        home.position = CGPoint(x: -(self.scene.size.width * 0.1), y: self.scene.size.height * 0.25)
-//        home.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
-//        home.zPosition = 100
-//        self.scene.addChild(home)
-//        let a2 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.45, y: self.scene.size.height * 0.25), duration: 0.3)
-//        home.run(a2)
-//
-//        //Restart CheckPoint
-//        let restart = SKSpriteNode(imageNamed: "Home Button")
-//        restart.position = CGPoint(x: (self.scene.size.width * 1.1), y: self.scene.size.height * 0.25)
-//        restart.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
-//        restart.zPosition = 100
-//        self.scene.addChild(restart)
-//        let a3 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.55, y: self.scene.size.height * 0.25), duration: 0.3)
-//        restart.run(a3)
-//
-//        //Game Over Label
-//        var gameOverlabel = SKLabelNode(fontNamed: "Avenir")
-//        gameOverlabel.fontSize = 50
-//        gameOverlabel.fontColor = UIColor.yellow
-//        gameOverlabel.horizontalAlignmentMode = .center
-//        gameOverlabel.verticalAlignmentMode = .bottom
-//        gameOverlabel.text = "GameOver"
-//        gameOverlabel.position = CGPoint(x: self.scene.size.width * 0.5, y: -(self.scene.size.height * 0.1))
-//        gameOverlabel.zPosition = 100
-//        self.scene.addChild(gameOverlabel)
-//        let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
-//        gameOverlabel.run(a4)
+        //        let sprite = SKSpriteNode(imageNamed: "Character Sad")
+        //        sprite.position = CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 1.5)
+        //        sprite.size = CGSize(width: self.scene.size.width * 0.3 , height: self.scene.size.width * 0.3);
+        //        sprite.zPosition = 100
+        //        self.scene.addChild(sprite)
+        //        let a = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.65), duration: 2)
+        //        sprite.run(a)
+        //
+        //        //Home
+        //        let home = SKSpriteNode(imageNamed: "Home Button")
+        //        home.position = CGPoint(x: -(self.scene.size.width * 0.1), y: self.scene.size.height * 0.25)
+        //        home.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
+        //        home.zPosition = 100
+        //        self.scene.addChild(home)
+        //        let a2 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.45, y: self.scene.size.height * 0.25), duration: 0.3)
+        //        home.run(a2)
+        //
+        //        //Restart CheckPoint
+        //        let restart = SKSpriteNode(imageNamed: "Home Button")
+        //        restart.position = CGPoint(x: (self.scene.size.width * 1.1), y: self.scene.size.height * 0.25)
+        //        restart.size = CGSize(width: self.scene.size.width * 0.08, height: self.scene.size.width * 0.08);
+        //        restart.zPosition = 100
+        //        self.scene.addChild(restart)
+        //        let a3 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.55, y: self.scene.size.height * 0.25), duration: 0.3)
+        //        restart.run(a3)
+        //
+        //        //Game Over Label
+        //        var gameOverlabel = SKLabelNode(fontNamed: "Avenir")
+        //        gameOverlabel.fontSize = 50
+        //        gameOverlabel.fontColor = UIColor.yellow
+        //        gameOverlabel.horizontalAlignmentMode = .center
+        //        gameOverlabel.verticalAlignmentMode = .bottom
+        //        gameOverlabel.text = "GameOver"
+        //        gameOverlabel.position = CGPoint(x: self.scene.size.width * 0.5, y: -(self.scene.size.height * 0.1))
+        //        gameOverlabel.zPosition = 100
+        //        self.scene.addChild(gameOverlabel)
+        //        let a4 = SKAction.move(to: CGPoint(x: self.scene.size.width * 0.5, y: self.scene.size.height * 0.4), duration: 0.3)
+        //        gameOverlabel.run(a4)
         
         self.gameover = true
         
@@ -607,7 +618,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.luminito?.run(SKAction.wait(forDuration: 5), completion: {
             self.luminito?.physicsBody?.categoryBitMask = self.luminitoCategory
         })
-    
+        
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
         }
@@ -639,6 +650,19 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.scene.isPaused = true
         playing = false
         luminitoInteraction = false
+    }
+    
+    func redrawEnergyIndicator(){
+        if energyIndicator != nil {
+            energyIndicator.removeFromParent()
+        }
+        if energy > 0 {
+            let rect = CGRect(x: 0, y: 0, width: self.scene.frame.width*0.2*CGFloat(energy > 100 ? 100 : energy)/100.0, height: self.scene.frame.height*0.03)
+            energyIndicator = SKShapeNode(rect: rect, cornerRadius: 10)
+            energyIndicator.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.95)
+            energyIndicator.fillColor = .yellow
+            self.scene.addChild(energyIndicator)
+        }
     }
 }
 
