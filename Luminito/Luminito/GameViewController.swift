@@ -63,6 +63,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var playButton = MenuButton(imageNamed: "Menu Play Button")
     var storeButton = MenuButton(imageNamed: "Store Button")
     var buttons = [MenuButton]()
+    var currentPowerUp: SKSpriteNode?
     
     var colectible: Colectible = .intangibility
     let luminitoCategory: UInt32 = 0x1 << 0
@@ -194,6 +195,13 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             buttons.append(storeButton)
             self.scene.addChild(storeButton)
             
+            self.currentPowerUp = SKSpriteNode()
+            currentPowerUp?.zPosition = 300
+            currentPowerUp?.size = CGSize(width: 50, height: 50)
+            currentPowerUp?.alpha = 0.8
+            currentPowerUp?.position = CGPoint(x: self.scene.size.width * 0.95, y: self.scene.size.height * 0.05)
+            self.scene.addChild(currentPowerUp!)
+            
             //adds the luminito node
             luminito.name = "Luminito"
             let position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
@@ -262,7 +270,13 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             if (deltaTimeTemp >= 1.0) {
                 //A second passed, 300.000 km traveled
-                //self.distance -= 300000
+                
+                //INCREASE DIFFICULTY
+    
+                //1,5 in velocity each 5 minutes
+                self.velocity += 0.005
+                
+                
                 
                 second += 1
                 powerUpTime += 1
@@ -290,6 +304,18 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 distance -= 105000
             } else {
                 distance -= 35000
+            }
+            
+            if self.powerUpGenerator?.isMagnetActive == true {
+                let nodes = self.scene.children
+                for node in nodes {
+                    if node.name == "electron" {
+                        
+                        let d = node.position.distance(to: luminito.position)
+                        node.run(SKAction.move(to: self.luminito.position, duration: TimeInterval(d/200)))
+                        
+                    }
+                }
             }
             
             deltaTime = 0.0
@@ -362,7 +388,11 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             }
             
         } else if wasTouched.categoryBitMask == powerUpCategory {
+            
+            
             //Something touched PowerUp
+            guard let n = wasTouched.node as! SKSpriteNode? else {return}
+            
             
             guard let powerUpsNames = self.powerUpGenerator?.powerUpNames else {return}
             guard let powerUps = self.powerUpGenerator?.powerUps else {return}
@@ -373,7 +403,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             wasTouched.node?.removeAllActions()
             
             
-            let act1 = SKAction.scale(to: 1.5, duration: 1)
+            let act1 = SKAction.scale(to: 1.5, duration: 0.7)
             let act2 = SKAction.scale(to: 0, duration: 0.3)
             let seq = SKAction.sequence([act1,act2])
             
@@ -382,12 +412,12 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             })
             
             wasTouched.node?.physicsBody = nil
+            self.currentPowerUp?.texture = n.texture
             
         } else if wasTouched.categoryBitMask == electronCategory {
             wasTouched.node?.removeFromParent()
             self.addElectron(increasingEnergy: true)
         }
-        
         
     }
     

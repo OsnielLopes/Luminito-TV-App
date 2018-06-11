@@ -20,6 +20,7 @@
 		EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */; };
 		EBE3D03A20C9B889009ED686 /* ParallaxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03920C9B889009ED686 /* ParallaxManager.swift */; };
 		EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */; };
+		EBEC49CE20CE2C3E00F29752 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEC49CD20CE2C3D00F29752 /* Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerUpGenerator.swift; sourceTree = "<group>"; };
 		EBE3D03920C9B889009ED686 /* ParallaxManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParallaxManager.swift; sourceTree = "<group>"; };
 		EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomGenerator.swift; sourceTree = "<group>"; };
+		EBEC49CD20CE2C3D00F29752 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = Luminito/Extensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 		492CD37920BC76D4007157B5 = {
 			isa = PBXGroup;
 			children = (
+				EBEC49CD20CE2C3D00F29752 /* Extensions.swift */,
 				492CD38420BC76D4007157B5 /* Luminito */,
 				492CD38320BC76D4007157B5 /* Products */,
 			);
@@ -159,6 +162,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBEC49CE20CE2C3E00F29752 /* Extensions.swift in Sources */,
 				EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */,
 				EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */,
 				B0DEE7CB20CDE5820080B5E2 /* MenuButton.swift in Sources */,

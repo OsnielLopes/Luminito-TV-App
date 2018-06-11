@@ -14,9 +14,10 @@ class PowerUpGenerator {
     //MARK: - Variables
     var timer = Timer()
     let gameViewController: GameViewController?
-    var powerUps: [Colectible] = [.intangibility,.intangibility,.velocityBoost,.velocityBoost,.velocityBoost,.meteorDestroyer,.meteorDestroyer]
-    var powerUpNames:[String] = ["ghost","ghost","boostVelocity","boostVelocity","boostVelocity","bomb","bomb"]
+    var powerUps: [Colectible] = [.intangibility,.intangibility,.velocityBoost,.velocityBoost,.velocityBoost,.meteorDestroyer,.magnet,.magnet]
+    var powerUpNames:[String] = ["ghost","ghost","boostVelocity","boostVelocity","boostVelocity","bomb","magnet","magnet"]
     var randonGen = RandomGenerator()
+    var isMagnetActive = false
     
     //MARK: - Initializer
     init(gameViewController: GameViewController) {
@@ -26,7 +27,7 @@ class PowerUpGenerator {
     //MARK: - Power Up generator
     
     func generatePowerUp() -> (colectible: Colectible, name: String) {
-        let ran = self.randonGen.generateRandomNumber(min: 4, max: self.powerUps.count - 1)
+        let ran = self.randonGen.generateRandomNumber(min: 0, max: self.powerUps.count - 1)
         let colectible = self.powerUps[ran]
         let name = self.powerUpNames[ran]
         
@@ -76,7 +77,8 @@ class PowerUpGenerator {
     }
     
     func activateMagnetPowerUp() {
-        
+        self.isMagnetActive = true
+        self.timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
     }
     
     func activateOneMoreLifePowerUp() {
@@ -94,7 +96,9 @@ class PowerUpGenerator {
             self.gameViewController?.addMeteors(qtde: (self.gameViewController?.qtdeMeteors)!)
         }
         
+        self.isMagnetActive = false
         self.gameViewController?.colectible = .none
+        self.gameViewController?.currentPowerUp?.texture = nil
         
         self.gameViewController?.luminito.run(SKAction.fadeIn(withDuration: 3), completion: {
             self.gameViewController?.luminito.physicsBody?.categoryBitMask = (self.gameViewController?.luminitoCategory)!
