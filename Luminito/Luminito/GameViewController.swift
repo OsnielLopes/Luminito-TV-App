@@ -88,8 +88,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var velocity = CGFloat(1)
     var powerUpTime = 0
     
-    
-    
     //MARK: - Managers
     var powerUpGenerator: PowerUpGenerator?
     
@@ -212,14 +210,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             let menu = Menu(gameScene: self.scene)
             menu.moveMenuToCenter(gameScene: self.scene)
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-                menu.playTapped(gameScene: self.scene)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-//                    menu.menuTapped(gameScene: self.scene)
-                })
-            })
-            
-            addSelectRecognizer()
+            //addSelectRecognizer()
             addMenuRecognizer()
             
             addMeteors(qtde: self.qtdeMeteors)
@@ -235,9 +226,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             energyIndicatorBackgorund.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.95)
             self.scene.addChild(energyIndicatorBackgorund)
             
-            //add the tap recognizer
-            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
-            view.addGestureRecognizer(tapRecognizer)
+            
+            if (playing == true){
+                addSelectRecognizer()
+            }
             
             //add the swipe recognizer
             let swipeGestureRocognizer = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe))
@@ -738,6 +730,11 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             if(focussedItem.name == "Play Button"){
                 print("Play selected")
                 menu.playTapped(gameScene: self.scene)
+                
+                //add the tap recognizer
+                let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
+                view.addGestureRecognizer(tapRecognizer)
+                
                 playing = true
             }else{
                 print("Store selected")
@@ -750,6 +747,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     @objc func menuPressed(sender: AnyObject){
         if(playing == true){
             menu.menuTapped(gameScene: self.scene)
+            addSelectRecognizer()
+            stop()
         }else{
             //TODO: Go back to AppleTV menu screen
         }
