@@ -646,6 +646,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         self.gameover = true
         
+        self.energy = 0
+        
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity * -10, dy: 0)
         }
