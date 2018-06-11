@@ -172,18 +172,18 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             //Set menu
             luminitoLabel.name = "Luminito Label"
-            luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.80)
-            luminitoLabel.size = CGSize(width: 380.0, height: 115.0)
+            luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.75)
+            luminitoLabel.size = CGSize(width: 540.0, height: 150.0)
             self.scene.addChild(luminitoLabel)
             
             foreveLabel.name = "Forever Label"
-            foreveLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.62)
-            foreveLabel.size = CGSize(width: 250.0, height: 100.0)
+            foreveLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.60)
+            foreveLabel.size = CGSize(width: 400.0, height: 120.0)
             self.scene.addChild(foreveLabel)
             
             playButton.name = "Play Button"
             playButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.40)
-            playButton.size = CGSize(width: 140.0, height: 65.0)
+            playButton.size = CGSize(width: 250.0, height: 120.0)
             playButton.isUserInteractionEnabled = true
             buttons.append(playButton)
             self.scene.addChild(playButton)

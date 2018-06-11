@@ -25,36 +25,28 @@ class Menu: SKSpriteNode {
     
     //Animação para trazer todo o menu para o centro da scene
     func moveMenuToCenter(gameScene: SKScene){
-        let moveLuminitoLabelToCenter = SKAction.move(to: CGPoint(x: gameScene.size.width/2, y: gameScene.size.height * 0.80), duration: 1.5)
+        let moveLuminitoLabelToCenter = SKAction.move(to: CGPoint(x: gameScene.size.width/2, y: gameScene.size.height * 0.75), duration: 1.5)
         gameScene.childNode(withName: "Luminito Label")?.run(moveLuminitoLabelToCenter)
         
-        let moveForeverLabelToCenter = SKAction.move(to: CGPoint(x: gameScene.size.width/2, y: gameScene.size.height * 0.62), duration: 1.5)
+        let moveForeverLabelToCenter = SKAction.move(to: CGPoint(x: gameScene.size.width/2, y: gameScene.size.height * 0.60), duration: 1.5)
         gameScene.childNode(withName: "Forever Label")?.run(moveForeverLabelToCenter)
         
         let movePlayButtonToCenter = SKAction.move(to: CGPoint(x: gameScene.size.width/2, y: gameScene.size.height * 0.40), duration: 1.5)
         gameScene.childNode(withName: "Play Button")?.run(movePlayButtonToCenter)
         gameScene.childNode(withName: "Play Button")?.isUserInteractionEnabled = true
-        
-        let moveStoreButtonToCenter = SKAction.move(to: CGPoint(x: gameScene.size.width/2, y: gameScene.size.height * 0.25), duration: 1.5)
-        gameScene.childNode(withName: "Store Button")?.run(moveStoreButtonToCenter)
-        gameScene.childNode(withName: "Store Button")?.isUserInteractionEnabled = true
     }
     
     //Animação para levar o menu para a esquerda até ficar fora da scene
     func moveMenuToLeftSide(gameScene: SKScene){
-        let moveLuminitoToLeft = SKAction.move(to: CGPoint(x: -gameScene.size.width, y: gameScene.size.height * 0.80), duration: 1.5)
+        let moveLuminitoToLeft = SKAction.move(to: CGPoint(x: -gameScene.size.width, y: gameScene.size.height * 0.75), duration: 1.5)
         gameScene.childNode(withName: "Luminito Label")?.run(moveLuminitoToLeft)
         
-        let moveForeverLabelToLeft = SKAction.move(to: CGPoint(x: -gameScene.size.width, y: gameScene.size.height * 0.62), duration: 1.5)
+        let moveForeverLabelToLeft = SKAction.move(to: CGPoint(x: -gameScene.size.width, y: gameScene.size.height * 0.60), duration: 1.5)
         gameScene.childNode(withName: "Forever Label")?.run(moveForeverLabelToLeft)
         
         let movePlayButtonToLeft = SKAction.move(to: CGPoint(x: -gameScene.size.width, y: gameScene.size.height * 0.40), duration: 1.5)
         gameScene.childNode(withName: "Play Button")?.run(movePlayButtonToLeft)
         gameScene.childNode(withName: "Play Button")?.isUserInteractionEnabled = false
-        
-        let moveStoreButtonToLeft = SKAction.move(to: CGPoint(x: -gameScene.size.width, y: gameScene.size.height * 0.25), duration: 1.5)
-        gameScene.childNode(withName: "Store Button")?.run(moveStoreButtonToLeft)
-        gameScene.childNode(withName: "Store Button")?.isUserInteractionEnabled = false
     }
     
     //Animação do Luminito entrando na scene
