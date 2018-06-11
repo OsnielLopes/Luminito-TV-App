@@ -11,6 +11,8 @@ import SpriteKit
 
 class Menu: SKSpriteNode {
     
+    var gameStarted = false
+    
     init() {
         super.init(texture: SKTexture(imageNamed: "Ateroide Grande"), color: UIColor.clear, size: CGSize(width: 0.0, height: 0.0))
     }
@@ -48,13 +50,15 @@ class Menu: SKSpriteNode {
         gameScene.childNode(withName: "Play Button")?.run(movePlayButtonToLeft)
         gameScene.childNode(withName: "Play Button")?.isUserInteractionEnabled = false
     }
-    
+
     //Animação do Luminito entrando na scene
     func playTapped(gameScene: SKScene){
         self.moveMenuToLeftSide(gameScene: gameScene)
         let moveLuminitoToScene = SKAction.move(to: CGPoint(x: gameScene.size.width * 0.1, y: gameScene.size.height * 0.50), duration: 1.0)
         gameScene.childNode(withName: "Luminito")?.run(moveLuminitoToScene)
         gameScene.childNode(withName: "Luminito")?.isUserInteractionEnabled = true
+        
+        self.gameStarted = true
     }
     
     // Animação do luminito saindo da scene e o menu voltando ao meio

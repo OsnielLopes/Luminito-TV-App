@@ -64,7 +64,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var buttons = [MenuButton]()
     var currentPowerUp: SKSpriteNode?
     
-    var colectible: Colectible = .intangibility
+    var colectible: Colectible = .none
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
     let intangibleLuminitoCategory: UInt32 = 0x1 << 2
@@ -82,6 +82,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var randomGen = RandomGenerator()
     var parallaxManager = ParallaxManager()
     var planetsArray: [Planets] = []
+    var gameStartAux = false
     
     //Difficulty Variables
     var qtdeMeteors = 5
@@ -223,8 +224,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             //addSelectRecognizer()
             addMenuRecognizer()
             
-            addMeteors(qtde: self.qtdeMeteors)
-            addElectron()
+            
             
             //add HUD
             self.distanceLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
@@ -258,6 +258,15 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         self.parallaxManager.moveParallaxSmallStars(velocity: self.velocity)
         self.parallaxManager.moveParallaxSmallMedium(velocity: self.velocity * 3)
+        
+        if self.menu.gameStarted == true {
+            
+            if self.gameStartAux == false {
+                addMeteors(qtde: self.qtdeMeteors)
+                addElectron()
+                
+                self.gameStartAux = true
+            }
         
         if self.gameover == false {
             
@@ -380,6 +389,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         }
         
         UserDefaults.standard.set(distance, forKey: "distance")
+            
+        }
     }
     
     //MARK: - ContactDelegate
@@ -452,8 +463,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     @objc func didTap(){
         
         if self.gameover == false {
-            
-            if self.colectible == .none {
                 
                 switch self.colectible {
                 case .intangibility:
@@ -486,7 +495,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 case .none:
                     print("powerUps disabled")
                 }
-            }
+            
         }
     }
     
@@ -592,7 +601,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     func addPowerUp() {
         let tuple = self.powerUpGenerator?.generatePowerUp()
-        self.colectible = (tuple?.colectible)!
         
         //Add movement and physics
         let powerUp = SKSpriteNode(imageNamed: (tuple?.name)!)
@@ -742,7 +750,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
         }
-        self.distanceUpdate = false
     }
     
     func addTapGestureRecognizer() {
@@ -764,7 +771,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.scene.isPaused = false
         playing = true
         luminitoInteraction = true
-        distanceUpdate = true
+        self.distanceUpdate = true
+        
     }
     
     func pause(){
@@ -791,6 +799,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     // Executa quando é dado um click no remote
     @objc func buttonSelected(sender: AnyObject){
+        
         if let focussedItem = UIScreen.main.focusedItem as? MenuButton {
             if(focussedItem.name == "Play Button"){
                 print("Play selected")
@@ -807,7 +816,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         }
         
     }
-    
+    var gameStarted = false
     // Executa quando o botão menu do remote é pressionado
     @objc func menuPressed(sender: AnyObject){
         if(playing == true){
