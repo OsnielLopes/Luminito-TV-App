@@ -52,10 +52,18 @@ struct Planets {
 class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDelegate {
     
     //MARK: - Luminito
-    var luminito: SKSpriteNode?
+    var luminito = SKSpriteNode(imageNamed: "Character Wow")
     
     //MARK: - Variables
     var scene: SKScene!
+    
+    let menu = Menu()
+    var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
+    var foreveLabel = SKSpriteNode(imageNamed: "Forever")
+    var playButton = MenuButton(imageNamed: "Menu Play Button")
+    var storeButton = MenuButton(imageNamed: "Store Button")
+    var buttons = [MenuButton]()
+    
     var colectible: Colectible = .intangibility
     let luminitoCategory: UInt32 = 0x1 << 0
     let meteorCategory: UInt32 = 0x1 << 1
@@ -63,9 +71,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let electronCategory: UInt32 = 0x1 << 3
     let powerUpCategory: UInt32 = 0x1 << 4
     var timer = Timer()
-    
-    var second = 0
-    var velocity = CGFloat(1)
     
     var gameover = false
     var playing = true
@@ -76,6 +81,13 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var randomGen = RandomGenerator()
     var parallaxManager = ParallaxManager()
     var planetsArray: [Planets] = []
+    
+    //Difficulty Variables
+    var qtdeMeteors = 5
+    var second = 0
+    var velocity = CGFloat(1)
+    var powerUpTime = 0
+
     
     
     //MARK: - Managers
@@ -159,19 +171,58 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             self.parallaxManager.startBackGroundParallaxSmallStars(view: scene.view!, sprite: "smallStars", zPosition: -4)
             self.parallaxManager.startBackGroundParallaxMediumSmall(view: scene.view!, sprite: "mediumSmallStars", zPosition: -3)
             
+            //Set menu
+            luminitoLabel.name = "Luminito Label"
+            luminitoLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.80)
+            luminitoLabel.size = CGSize(width: 380.0, height: 115.0)
+            self.scene.addChild(luminitoLabel)
+            
+            foreveLabel.name = "Forever Label"
+            foreveLabel.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.62)
+            foreveLabel.size = CGSize(width: 250.0, height: 100.0)
+            self.scene.addChild(foreveLabel)
+            
+            playButton.name = "Play Button"
+            playButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.40)
+            playButton.size = CGSize(width: 140.0, height: 65.0)
+            playButton.isUserInteractionEnabled = true
+            buttons.append(playButton)
+            self.scene.addChild(playButton)
+            
+            storeButton.name = "Store Button"
+            storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.25)
+            storeButton.size = CGSize(width: 140.0, height: 65.0)
+            storeButton.isUserInteractionEnabled = true
+            buttons.append(storeButton)
+            self.scene.addChild(storeButton)
+            
             //adds the luminito node
-            self.luminito = SKSpriteNode(imageNamed: "Character Wow")
-            let position = CGPoint(x: self.scene.frame.width*0.1, y: self.scene.frame.height*0.5)
-            luminito?.position = position
-            let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: (luminito?.size)!)
+            luminito.name = "Luminito"
+            let position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
+            luminito.position = position
+            let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: CGSize(width: 150.0, height: 150.0))
             luminitoPhysicsBody.categoryBitMask = luminitoCategory
             luminitoPhysicsBody.collisionBitMask = meteorCategory
             
             luminitoPhysicsBody.isDynamic = false
-            luminito?.physicsBody = luminitoPhysicsBody
-            self.scene.addChild(luminito!)
+            luminito.physicsBody = luminitoPhysicsBody
+            self.scene.addChild(luminito)
+
+            //Menu
+            let menu = Menu(gameScene: self.scene)
+            menu.moveMenuToCenter(gameScene: self.scene)
             
-            addMeteors()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                menu.playTapped(gameScene: self.scene)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                    menu.menuTapped(gameScene: self.scene)
+                })
+            })
+            
+            addSelectRecognizer()
+            addMenuRecognizer()
+            
+            addMeteors(qtde: self.qtdeMeteors)
             addElectron()
             
             //add HUD
@@ -200,7 +251,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         // Release any cached data, images, etc that aren't in use.
     }
     
-    var powerUpTime = 0
     //MARK: - SKSceneDelegate
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         
@@ -257,7 +307,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
         } else {
             //GameOver, return distance, there's some frames lost, so we have to increase distance amount per frame
-            //distance += 35000
+            distance += 35000
         }
         
         scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
@@ -300,7 +350,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - ContactDelegate
     
     func didBegin(_ contact: SKPhysicsContact) {
-        
+
         //Luminito
         let whoTouch = contact.bodyA
         
@@ -313,30 +363,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             switch whoTouch.categoryBitMask {
             case luminitoCategory:
                 //Luminito touched meteor and dies tragically
-                
                 self.gameOver()
-                //
-                //                for meteor in self.meteors {
-                //                    meteor.physicsBody = nil
-                //                }
-                //
-                //                whoTouch.categoryBitMask = intangibleLuminitoCategory
-                //                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-                //                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
-                //                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-                //
-                //                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
-                //
-                //                let seq = [a1,a2,a3]
-                //                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
-                //
-                //                    whoTouch.node?.run(a4, completion: {
-                //                        self.gameOver()
-                //                    })
-                //                })
-                
-                
-                
                 break
             default:
                 break
@@ -351,12 +378,24 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             guard let i = powerUpsNames.index(of: (wasTouched.node?.name)!) else {return}
             self.colectible = powerUps[i]
             
-            wasTouched.node?.removeFromParent()
+            wasTouched.node?.removeAllActions()
+            
+            
+            let act1 = SKAction.scale(to: 1.5, duration: 1)
+            let act2 = SKAction.scale(to: 0, duration: 0.3)
+            let seq = SKAction.sequence([act1,act2])
+            
+            wasTouched.node?.run(seq, completion: {
+                wasTouched.node?.removeFromParent()
+            })
+            
+            wasTouched.node?.physicsBody = nil
             
         } else if wasTouched.categoryBitMask == electronCategory {
             wasTouched.node?.removeFromParent()
             self.addElectron(increasingEnergy: true)
         }
+        
         
     }
     
@@ -387,11 +426,20 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             case .meteorRepellent:
                 print("not allowed yet")
             case .meteorDestroyer:
-                print("not allowed yet")
+                
+                self.powerUpGenerator?.activateMeteorDestroyerPowerUp()
+                print("Destroyer Engaged")
+                
             case .magnet:
+                
+                self.powerUpGenerator?.activateMagnetPowerUp()
                 print("not allowed yet")
+                
             case .oneMoreLife:
+                
+                self.powerUpGenerator?.activateOneMoreLifePowerUp()
                 print("not allowed yet")
+                
             case .none:
                 print("powerUps disabled")
             }
@@ -428,7 +476,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         meteor.position = meteorPosition
         let meteorPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Asteroide Pequeno"), size: meteor.size)
         meteorPhysicsBody.categoryBitMask = meteorCategory
-        meteorPhysicsBody.collisionBitMask = luminitoCategory | meteorCategory
+        meteorPhysicsBody.collisionBitMask = luminitoCategory //| meteorCategory
         meteorPhysicsBody.contactTestBitMask = luminitoCategory
         
         meteorPhysicsBody.isDynamic = true
@@ -482,6 +530,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         //Add movement and physics
         let powerUp = SKSpriteNode(imageNamed: (tuple?.name)!)
         powerUp.name = tuple?.name
+        powerUp.zPosition = 300
         powerUp.size = CGSize(width: powerUp.size.width * 0.4, height: powerUp.size.height * 0.4)
         let y = self.randomGen.generateRandomNumber(min: 0, max: Int(self.scene.frame.height))
         powerUp.position = CGPoint(x: Int(self.scene.frame.width), y: y)
@@ -496,7 +545,9 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         powerUp.physicsBody = powerUpPhysicsBody
         
         self.scene.addChild(powerUp)
-        powerUp.run(action)
+        powerUp.run(action) {
+            powerUp.removeFromParent()
+        }
     }
     
     func createRandomMeteor() -> SKMeteorNode {
@@ -524,23 +575,23 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     }
     
     func fillPlanetsArray() {
-        let mercury = Planets(name: "Mercurio 2", distance: PlanetDistances.mercury, size: 50)
+        let mercury = Planets(name: "Mercurio 2", distance: PlanetDistances.mercury, size: 80)
         self.planetsArray.append(mercury)
-        let venus = Planets(name: "Venus 2", distance: PlanetDistances.venus, size: 90)
+        let venus = Planets(name: "Venus 2", distance: PlanetDistances.venus, size: 120)
         self.planetsArray.append(venus)
-        let earth = Planets(name: "Terra 2", distance: PlanetDistances.earth, size: 100)
+        let earth = Planets(name: "Terra 2", distance: PlanetDistances.earth, size: 120)
         self.planetsArray.append(earth)
-        let mars = Planets(name: "Marte 2", distance: PlanetDistances.mars, size: 80)
+        let mars = Planets(name: "Marte 2", distance: PlanetDistances.mars, size: 100)
         self.planetsArray.append(mars)
         let jupiter = Planets(name: "Jupiter 2", distance: PlanetDistances.jupiter, size: 200)
         self.planetsArray.append(jupiter)
         let saturn = Planets(name: "Saturno 2", distance: PlanetDistances.saturn, size: 180)
         self.planetsArray.append(saturn)
-        let uranus = Planets(name: "Urano 2", distance: PlanetDistances.uranus, size: 150)
+        let uranus = Planets(name: "Urano 2", distance: PlanetDistances.uranus, size: 160)
         self.planetsArray.append(uranus)
-        let neptune = Planets(name: "Netuno 2", distance: PlanetDistances.neptune, size: 140)
+        let neptune = Planets(name: "Netuno 2", distance: PlanetDistances.neptune, size: 150)
         self.planetsArray.append(neptune)
-        let pluto = Planets(name: "Plutao 2", distance: PlanetDistances.pluto, size: 40)
+        let pluto = Planets(name: "Plutao 2", distance: PlanetDistances.pluto, size: 70)
         self.planetsArray.append(pluto)
     }
     
@@ -592,7 +643,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity * -10, dy: 0)
         }
         
-        self.luminito?.physicsBody?.categoryBitMask = intangibleLuminitoCategory
+        self.luminito.physicsBody?.categoryBitMask = intangibleLuminitoCategory
         self.velocity *= -10
         
         self.timer = Timer.scheduledTimer(timeInterval: 5, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
@@ -615,8 +666,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.gameover = false
         self.velocity /= -10
         
-        self.luminito?.run(SKAction.wait(forDuration: 5), completion: {
-            self.luminito?.physicsBody?.categoryBitMask = self.luminitoCategory
+        self.luminito.run(SKAction.wait(forDuration: 3), completion: {
+            self.luminito.physicsBody?.categoryBitMask = self.luminitoCategory
         })
         
         for meteor in self.meteors {
@@ -651,6 +702,57 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         playing = false
         luminitoInteraction = false
     }
+    
+    // Adiciona o recognizer de quando é dado um click do remote
+    func addSelectRecognizer(){
+        let selectRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.buttonSelected(sender:)))
+        selectRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.select.rawValue)]
+        self.view?.addGestureRecognizer(selectRecognizer)
+    }
+    
+    // Adiciona o recognizer do botão menu do remote
+    func addMenuRecognizer(){
+        let menuRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.menuPressed(sender:)))
+        menuRecognizer.allowedPressTypes = [NSNumber(value: UIPressType.menu.rawValue)]
+        self.view?.addGestureRecognizer(menuRecognizer)
+    }
+    
+    // Executa quando é dado um click no remote
+    @objc func buttonSelected(sender: AnyObject){
+        if let focussedItem = UIScreen.main.focusedItem as? MenuButton {
+            if(focussedItem.name == "Play Button"){
+                print("Play selected")
+                menu.playTapped(gameScene: self.scene)
+                playing = true
+            }else{
+                print("Store selected")
+            }
+        }
+        
+    }
+    
+    // Executa quando o botão menu do remote é pressionado
+    @objc func menuPressed(sender: AnyObject){
+        if(playing == true){
+            menu.menuTapped(gameScene: self.scene)
+        }else{
+            //TODO: Go back to AppleTV menu screen
+        }
+    }
+    
+    // Troca o botão focado
+    override func didUpdateFocus(in context: UIFocusUpdateContext, with coordinator: UIFocusAnimationCoordinator) {
+        let prevItem = context.previouslyFocusedItem
+        let nextItem = context.nextFocusedItem
+        
+        if let prevButton = prevItem as? MenuButton {
+            prevButton.buttonDidLoseFocus()
+        }
+        if let nextButton = nextItem as? MenuButton {
+            nextButton.buttonDidGetFocus()
+        }
+    }
+
     
     func redrawEnergyIndicator(){
         if energyIndicator != nil {

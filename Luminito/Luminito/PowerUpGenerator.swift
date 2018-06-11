@@ -14,8 +14,8 @@ class PowerUpGenerator {
     //MARK: - Variables
     var timer = Timer()
     let gameViewController: GameViewController?
-    var powerUps: [Colectible] = [.intangibility,.intangibility,.velocityBoost,.velocityBoost,.velocityBoost]
-    var powerUpNames:[String] = ["ghost","ghost","boostVelocity","boostVelocity","boostVelocity"]
+    var powerUps: [Colectible] = [.intangibility,.intangibility,.velocityBoost,.velocityBoost,.velocityBoost,.meteorDestroyer,.meteorDestroyer]
+    var powerUpNames:[String] = ["ghost","ghost","boostVelocity","boostVelocity","boostVelocity","bomb","bomb"]
     var randonGen = RandomGenerator()
     
     //MARK: - Initializer
@@ -26,7 +26,7 @@ class PowerUpGenerator {
     //MARK: - Power Up generator
     
     func generatePowerUp() -> (colectible: Colectible, name: String) {
-        let ran = self.randonGen.generateRandomNumber(min: 0, max: self.powerUps.count - 1)
+        let ran = self.randonGen.generateRandomNumber(min: 4, max: self.powerUps.count - 1)
         let colectible = self.powerUps[ran]
         let name = self.powerUpNames[ran]
         
@@ -36,6 +36,8 @@ class PowerUpGenerator {
     
     //MARK: - Power Up activate functions
     func activateVelocityBoostPowerUp() {
+        
+        self.gameViewController?.luminito.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleLuminitoCategory)!
         
         let meteors = self.gameViewController?.meteors
         for meteor in meteors! {
@@ -48,22 +50,54 @@ class PowerUpGenerator {
     }
     
     func activateIntangibilityPowerUp() {
-        self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleLuminitoCategory)!
-        self.gameViewController?.luminito?.run(SKAction.fadeAlpha(to: 0.5, duration: 3))
+        self.gameViewController?.luminito.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleLuminitoCategory)!
+        self.gameViewController?.luminito.run(SKAction.fadeAlpha(to: 0.5, duration: 3))
         self.timer = Timer.scheduledTimer(timeInterval: 15, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
     }
+    
+    func activateMeteorDestroyerPowerUp() {
+        var meteors = self.gameViewController?.meteors
+        let fadeOut = SKAction.fadeOut(withDuration: 0.3)
+        let fadeIn = SKAction.fadeIn(withDuration: 0.3)
+        let seq = SKAction.sequence([fadeOut,fadeIn])
+        let action = SKAction.repeat(seq, count: 4)
+        
+        for meteor in meteors! {
+            meteor.run(action) {
+                meteor.removeFromParent()
+            }
+        }
+        
+        meteors = []
+        
+        self.gameViewController?.luminito.physicsBody?.categoryBitMask = (self.gameViewController?.intangibleLuminitoCategory)!
+        
+        self.timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: (#selector(stop)), userInfo: nil, repeats: false)
+    }
+    
+    func activateMagnetPowerUp() {
+        
+    }
+    
+    func activateOneMoreLifePowerUp() {
+        
+    }
+    
+    
     
     //MARK: - Power Up time stop
     @objc func stop() {
         
-        if ((self.gameViewController?.colectible = .velocityBoost) != nil) {
+        if ((self.gameViewController?.colectible == .velocityBoost)) {
             self.gameViewController?.velocity = (self.gameViewController?.velocity)! / 3
+        } else if self.gameViewController?.colectible == .meteorDestroyer{
+            self.gameViewController?.addMeteors(qtde: (self.gameViewController?.qtdeMeteors)!)
         }
         
         self.gameViewController?.colectible = .none
         
-        self.gameViewController?.luminito?.run(SKAction.fadeIn(withDuration: 3), completion: {
-            self.gameViewController?.luminito?.physicsBody?.categoryBitMask = (self.gameViewController?.luminitoCategory)!
+        self.gameViewController?.luminito.run(SKAction.fadeIn(withDuration: 3), completion: {
+            self.gameViewController?.luminito.physicsBody?.categoryBitMask = (self.gameViewController?.luminitoCategory)!
         })
     }
     

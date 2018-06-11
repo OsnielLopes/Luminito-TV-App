@@ -15,6 +15,8 @@
 		492CD39320BC76D7007157B5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 492CD39220BC76D7007157B5 /* Assets.xcassets */; };
 		49375B5D20BF2CAF002403CD /* SKMeteorNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */; };
 		49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */; };
+		B0DEE7C920CDE5640080B5E2 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DEE7C820CDE5640080B5E2 /* Menu.swift */; };
+		B0DEE7CB20CDE5820080B5E2 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DEE7CA20CDE5820080B5E2 /* MenuButton.swift */; };
 		EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */; };
 		EBE3D03A20C9B889009ED686 /* ParallaxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03920C9B889009ED686 /* ParallaxManager.swift */; };
 		EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */; };
@@ -31,6 +33,8 @@
 		492CD39420BC76D7007157B5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		49375B5C20BF2CAF002403CD /* SKMeteorNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorNode.swift; sourceTree = "<group>"; };
 		49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorPhysicsBody.swift; sourceTree = "<group>"; };
+		B0DEE7C820CDE5640080B5E2 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
+		B0DEE7CA20CDE5820080B5E2 /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
 		EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerUpGenerator.swift; sourceTree = "<group>"; };
 		EBE3D03920C9B889009ED686 /* ParallaxManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParallaxManager.swift; sourceTree = "<group>"; };
 		EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomGenerator.swift; sourceTree = "<group>"; };
@@ -66,6 +70,8 @@
 		492CD38420BC76D4007157B5 /* Luminito */ = {
 			isa = PBXGroup;
 			children = (
+				B0DEE7CA20CDE5820080B5E2 /* MenuButton.swift */,
+				B0DEE7C820CDE5640080B5E2 /* Menu.swift */,
 				492CD38520BC76D4007157B5 /* AppDelegate.swift */,
 				492CD38920BC76D4007157B5 /* Actions.sks */,
 				492CD38B20BC76D4007157B5 /* GameScene.swift */,
@@ -155,10 +161,12 @@
 			files = (
 				EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */,
 				EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */,
+				B0DEE7CB20CDE5820080B5E2 /* MenuButton.swift in Sources */,
 				492CD38C20BC76D4007157B5 /* GameScene.swift in Sources */,
 				EBE3D03A20C9B889009ED686 /* ParallaxManager.swift in Sources */,
 				49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */,
 				49375B5D20BF2CAF002403CD /* SKMeteorNode.swift in Sources */,
+				B0DEE7C920CDE5640080B5E2 /* Menu.swift in Sources */,
 				492CD38E20BC76D4007157B5 /* GameViewController.swift in Sources */,
 				492CD38620BC76D4007157B5 /* AppDelegate.swift in Sources */,
 			);
