@@ -75,6 +75,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var gameover = false
     var playing = true
     var luminitoInteraction = false
+    var distanceUpdate = false
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
     var lastTime: TimeInterval = 0.0
@@ -313,10 +314,12 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             }
             
             //Update calls it aproximally 9 times per second, so in one second is 35000 * 9 =˜ 300.000  km (1s c)
-            if self.colectible == .velocityBoost {
-                distance -= 105000
-            } else {
-                distance -= 35000
+            if (distanceUpdate == true){
+                if self.colectible == .velocityBoost {
+                    distance -= 105000
+                } else {
+                    distance -= 35000
+                }
             }
             
             if self.powerUpGenerator?.isMagnetActive == true {
@@ -739,6 +742,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
         }
+        self.distanceUpdate = false
     }
     
     func addTapGestureRecognizer() {
@@ -760,6 +764,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.scene.isPaused = false
         playing = true
         luminitoInteraction = true
+        distanceUpdate = true
     }
     
     func pause(){
@@ -767,6 +772,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.scene.isPaused = true
         playing = false
         luminitoInteraction = false
+        distanceUpdate = false
     }
     
     // Adiciona o recognizer de quando é dado um click do remote
@@ -796,6 +802,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 
                 luminitoInteraction = true
                 playing = true
+                distanceUpdate = true
             }
         }
         
@@ -807,6 +814,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             menu.menuTapped(gameScene: self.scene)
             addSelectRecognizer()
             stop()
+            //pause()
         }else{
             //TODO: Go back to AppleTV menu screen
         }
