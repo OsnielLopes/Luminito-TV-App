@@ -87,6 +87,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var second = 0
     var velocity = CGFloat(1)
     var powerUpTime = 0
+    var timeForAddMeteor = 0
     
     //MARK: - Managers
     var powerUpGenerator: PowerUpGenerator?
@@ -276,8 +277,20 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 //1,5 in velocity each 5 minutes
                 self.velocity += 0.005
                 
+                //Each 15 minutes
+                if timeForAddMeteor == 600 {
+                    self.qtdeMeteors += 1
+                    
+                    for meteor in self.meteors {
+                        meteor.removeFromParent()
+                    }
+                    self.meteors = []
+                    
+                    self.addMeteors(qtde: self.qtdeMeteors)
+                }
                 
                 
+                timeForAddMeteor += 1
                 second += 1
                 powerUpTime += 1
                 
@@ -436,39 +449,42 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     @objc func didTap(){
         
         if self.gameover == false {
-            switch self.colectible {
-            case .intangibility:
+            
+            if self.colectible == .none {
                 
-                self.powerUpGenerator?.activateIntangibilityPowerUp()
-                print("Intangibility Engaged")
-                
-            case .velocityBoost:
-                
-                self.powerUpGenerator?.activateVelocityBoostPowerUp()
-                print("Velocity Engaged")
-                
-            case .meteorRepellent:
-                print("not allowed yet")
-            case .meteorDestroyer:
-                
-                self.powerUpGenerator?.activateMeteorDestroyerPowerUp()
-                print("Destroyer Engaged")
-                
-            case .magnet:
-                
-                self.powerUpGenerator?.activateMagnetPowerUp()
-                print("not allowed yet")
-                
-            case .oneMoreLife:
-                
-                self.powerUpGenerator?.activateOneMoreLifePowerUp()
-                print("not allowed yet")
-                
-            case .none:
-                print("powerUps disabled")
+                switch self.colectible {
+                case .intangibility:
+                    
+                    self.powerUpGenerator?.activateIntangibilityPowerUp()
+                    print("Intangibility Engaged")
+                    
+                case .velocityBoost:
+                    
+                    self.powerUpGenerator?.activateVelocityBoostPowerUp()
+                    print("Velocity Engaged")
+                    
+                case .meteorRepellent:
+                    print("not allowed yet")
+                case .meteorDestroyer:
+                    
+                    self.powerUpGenerator?.activateMeteorDestroyerPowerUp()
+                    print("Destroyer Engaged")
+                    
+                case .magnet:
+                    
+                    self.powerUpGenerator?.activateMagnetPowerUp()
+                    print("not allowed yet")
+                    
+                case .oneMoreLife:
+                    
+                    self.powerUpGenerator?.activateOneMoreLifePowerUp()
+                    print("not allowed yet")
+                    
+                case .none:
+                    print("powerUps disabled")
+                }
             }
         }
-        
     }
     
     @objc func didSwipe() {
@@ -593,7 +609,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         let texture: SKTexture?
         let size: CGSize?
-        let xVelocity = -(Int(arc4random_uniform(100))+100)
+        let xVelocity = -(Int(arc4random_uniform(100))+100+Int(velocity * 2))
         
         let type = Int(arc4random_uniform(2))
         
