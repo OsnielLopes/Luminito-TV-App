@@ -58,11 +58,7 @@
 		492CD37920BC76D4007157B5 = {
 			isa = PBXGroup;
 			children = (
-<<<<<<< HEAD
 				EBEC49CD20CE2C3D00F29752 /* Extensions.swift */,
-=======
-				B0DEE7CC20CE2CAC0080B5E2 /* Extensions.swift */,
->>>>>>> 9f49f678fd8ebe9b879f209d71c0239e0eab3871
 				492CD38420BC76D4007157B5 /* Luminito */,
 				492CD38320BC76D4007157B5 /* Products */,
 			);
@@ -168,11 +164,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-<<<<<<< HEAD
 				EBEC49CE20CE2C3E00F29752 /* Extensions.swift in Sources */,
-=======
-				B0DEE7CD20CE2CAC0080B5E2 /* Extensions.swift in Sources */,
->>>>>>> 9f49f678fd8ebe9b879f209d71c0239e0eab3871
 				EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */,
 				EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */,
 				B0DEE7CB20CDE5820080B5E2 /* MenuButton.swift in Sources */,
