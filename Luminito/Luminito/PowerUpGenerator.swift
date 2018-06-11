@@ -27,7 +27,7 @@ class PowerUpGenerator {
     //MARK: - Power Up generator
     
     func generatePowerUp() -> (colectible: Colectible, name: String) {
-        let ran = self.randonGen.generateRandomNumber(min: 2, max: self.powerUps.count - 3)
+        let ran = self.randonGen.generateRandomNumber(min: 0, max: self.powerUps.count - 1)
         let colectible = self.powerUps[ran]
         let name = self.powerUpNames[ran]
         
