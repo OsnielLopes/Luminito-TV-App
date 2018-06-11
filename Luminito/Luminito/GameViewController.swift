@@ -74,7 +74,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     var gameover = false
     var playing = true
-    var luminitoInteraction = true
+    var luminitoInteraction = false
     var deltaTime = 0.0
     var deltaTimeTemp = 0.0
     var lastTime: TimeInterval = 0.0
@@ -197,7 +197,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
 
             //adds the luminito node
             luminito.name = "Luminito"
-            let position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
+            let position = CGPoint(x: -(scene?.size.width)!/1.4, y: self.scene.size.height/2)
             luminito.position = position
             let luminitoPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Character Wow"), size: CGSize(width: 150.0, height: 150.0))
             luminitoPhysicsBody.categoryBitMask = luminitoCategory
@@ -205,6 +205,13 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             luminitoPhysicsBody.isDynamic = false
             luminito.physicsBody = luminitoPhysicsBody
+            
+            let range = SKRange(lowerLimit: 50, upperLimit: scene.frame.height - 50)
+            let topAndBottomLocker = SKConstraint.positionY(range)
+            
+            luminito.constraints = [ topAndBottomLocker ]
+            luminito.isUserInteractionEnabled = true
+            
             self.scene.addChild(luminito)
             
             //Menu
@@ -419,8 +426,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
-            let pos = touch.location(in: self.scene)
-            luminito.position.y = pos.y
+            if(luminitoInteraction == true){
+                let pos = touch.location(in: self.scene)
+                luminito.position.y = pos.y
+            }
         }
     }
     
@@ -760,6 +769,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTap))
                 view.addGestureRecognizer(tapRecognizer)
                 
+                luminitoInteraction = true
                 playing = true
             }
         }

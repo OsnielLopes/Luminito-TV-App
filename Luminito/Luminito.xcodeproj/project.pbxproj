@@ -17,7 +17,6 @@
 		49375B5F20BF2ECB002403CD /* SKMeteorPhysicsBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */; };
 		B0DEE7C920CDE5640080B5E2 /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DEE7C820CDE5640080B5E2 /* Menu.swift */; };
 		B0DEE7CB20CDE5820080B5E2 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DEE7CA20CDE5820080B5E2 /* MenuButton.swift */; };
-		B0DEE7CD20CE2CAC0080B5E2 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0DEE7CC20CE2CAC0080B5E2 /* Extensions.swift */; };
 		EBDD2BE720C324E100AF0D77 /* PowerUpGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */; };
 		EBE3D03A20C9B889009ED686 /* ParallaxManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03920C9B889009ED686 /* ParallaxManager.swift */; };
 		EBE3D03C20C9B891009ED686 /* RandomGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */; };
@@ -37,7 +36,6 @@
 		49375B5E20BF2ECB002403CD /* SKMeteorPhysicsBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKMeteorPhysicsBody.swift; sourceTree = "<group>"; };
 		B0DEE7C820CDE5640080B5E2 /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
 		B0DEE7CA20CDE5820080B5E2 /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
-		B0DEE7CC20CE2CAC0080B5E2 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = Luminito/Extensions.swift; sourceTree = "<group>"; };
 		EBDD2BE620C324E100AF0D77 /* PowerUpGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerUpGenerator.swift; sourceTree = "<group>"; };
 		EBE3D03920C9B889009ED686 /* ParallaxManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParallaxManager.swift; sourceTree = "<group>"; };
 		EBE3D03B20C9B891009ED686 /* RandomGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomGenerator.swift; sourceTree = "<group>"; };
@@ -310,7 +308,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Q352GCJU8N;
+				DEVELOPMENT_TEAM = BUP56BZHCB;
 				INFOPLIST_FILE = Luminito/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -329,7 +327,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = Q352GCJU8N;
+				DEVELOPMENT_TEAM = BUP56BZHCB;
 				INFOPLIST_FILE = Luminito/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
