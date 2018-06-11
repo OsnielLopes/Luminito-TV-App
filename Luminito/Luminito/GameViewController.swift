@@ -87,7 +87,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var second = 0
     var velocity = CGFloat(1)
     var powerUpTime = 0
-
+    
     
     
     //MARK: - Managers
@@ -134,7 +134,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var energy: Int = 90 {
         didSet {
             self.energyLabel.text = "\(energy) N"
-                self.redrawEnergyIndicator()
+            self.redrawEnergyIndicator()
         }
     }
     
@@ -207,7 +207,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             luminitoPhysicsBody.isDynamic = false
             luminito.physicsBody = luminitoPhysicsBody
             self.scene.addChild(luminito)
-
+            
             //Menu
             let menu = Menu(gameScene: self.scene)
             menu.moveMenuToCenter(gameScene: self.scene)
@@ -215,7 +215,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
                 menu.playTapped(gameScene: self.scene)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
-                    menu.menuTapped(gameScene: self.scene)
+//                    menu.menuTapped(gameScene: self.scene)
                 })
             })
             
@@ -350,7 +350,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - ContactDelegate
     
     func didBegin(_ contact: SKPhysicsContact) {
-
+        
         //Luminito
         let whoTouch = contact.bodyA
         
@@ -405,7 +405,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let pos = touch.location(in: self.scene)
-            luminito?.position.y = pos.y
+            luminito.position.y = pos.y
         }
     }
     
@@ -445,24 +445,39 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             }
         }
         
-        self.scene.enumerateChildNodes(withName: "meteor") { (node, end) in
-            guard let meteor = node as? SKSpriteNode else {
-                return
-            }
-        }
-        
     }
     
     @objc func didSwipe() {
         if energy == 100 {
             energy = 0
+            var closerMeteor: SKNode?
+            self.scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
+                if closerMeteor == nil {
+                    closerMeteor = node
+                } else if node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!{
+                    closerMeteor = node
+                }
+            }
+            
+            let shot = SKSpriteNode(imageNamed: "electron")
+            shot.size = CGSize(width: shot.size.width*0.1, height: shot.size.height*0.1)
+            shot.position = luminito.position
+            self.scene.addChild(shot)
+            let action = SKAction.move(to: (closerMeteor?.position)!, duration: 1)
+            shot.run(action) {
+                shot.removeFromParent()
+                closerMeteor?.removeFromParent()
+                self.addMeteor()
+            }
+            
+            
         }
     }
     
     //MARK: - Auxiliar Functions
-    private func addMeteors() {
-        for _ in 0..<10{
-            //            addMeteor()
+    func addMeteors(qtde: Int) {
+        for _ in 0..<qtde{
+            addMeteor()
         }
     }
     
@@ -752,7 +767,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             nextButton.buttonDidGetFocus()
         }
     }
-
     
     func redrawEnergyIndicator(){
         if energyIndicator != nil {
