@@ -227,13 +227,15 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             
             //add HUD
-            self.distanceLabel.position = CGPoint(x: self.scene.frame.width * 0.15, y: self.scene.frame.height * 0.95)
+            self.distanceLabel.position = CGPoint(x: self.scene.frame.width * 0.18, y: self.scene.frame.height * 0.90)
+            self.distanceLabel.zPosition = 1000
             self.scene.addChild(self.distanceLabel)
-            self.energyLabel.position = CGPoint(x: (self.scene.frame.width * 0.95) - (self.energyLabel.frame.width/2), y: self.scene.frame.height * 0.95)
+            self.energyLabel.position = CGPoint(x: (self.scene.frame.width * 0.95) - (self.energyLabel.frame.width/2), y: self.scene.frame.height * 0.90)
             self.scene.addChild(self.energyLabel)
             let rect = CGRect(x: 0, y: 0, width: self.scene.frame.width*0.2, height: self.scene.frame.height*0.03)
             self.energyIndicatorBackgorund = SKShapeNode(rect: rect, cornerRadius: 10)
-            energyIndicatorBackgorund.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.95)
+            energyIndicatorBackgorund.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.90)
+            energyIndicatorBackgorund.zPosition = 1000
             self.scene.addChild(energyIndicatorBackgorund)
             
             
@@ -371,10 +373,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                     meteor.position = CGPoint(x: self.scene.frame.width, y: CGFloat(yPos))
                 }
             }
-            
-            if self.colectible == .none {
-                meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
-            }
+//
+//            if self.gameover == false {
+//                meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity, dy: 0)
+//            }
             
         }
         
@@ -730,7 +732,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 guard let nebula = node as? SKSpriteNode else {
                     return
                 }
-                
                 nebula.run(SKAction.fadeOut(withDuration: 1), completion: {
                     nebula.removeFromParent()
                 })
@@ -849,7 +850,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         if energy > 0 {
             let rect = CGRect(x: 0, y: 0, width: self.scene.frame.width*0.2*CGFloat(energy > 100 ? 100 : energy)/100.0, height: self.scene.frame.height*0.03)
             energyIndicator = SKShapeNode(rect: rect, cornerRadius: 10)
-            energyIndicator.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.95)
+            energyIndicator.position = CGPoint(x: self.scene.frame.width*0.7, y: self.scene.frame.height * 0.90)
+            energyIndicator.zPosition = 1000
             energyIndicator.fillColor = .yellow
             self.scene.addChild(energyIndicator)
         }

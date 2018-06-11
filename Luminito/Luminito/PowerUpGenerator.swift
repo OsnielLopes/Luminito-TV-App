@@ -27,7 +27,7 @@ class PowerUpGenerator {
     //MARK: - Power Up generator
     
     func generatePowerUp() -> (colectible: Colectible, name: String) {
-        let ran = self.randonGen.generateRandomNumber(min: 0, max: self.powerUps.count - 1)
+        let ran = self.randonGen.generateRandomNumber(min: 2, max: self.powerUps.count - 3)
         let colectible = self.powerUps[ran]
         let name = self.powerUpNames[ran]
         
@@ -91,6 +91,12 @@ class PowerUpGenerator {
     @objc func stop() {
         
         if ((self.gameViewController?.colectible == .velocityBoost)) {
+            
+            let meteors = self.gameViewController?.meteors
+            for meteor in meteors! {
+                meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity / 3, dy: 0)
+            }
+            
             self.gameViewController?.velocity = (self.gameViewController?.velocity)! / 3
         } else if self.gameViewController?.colectible == .meteorDestroyer{
             self.gameViewController?.addMeteors(qtde: (self.gameViewController?.qtdeMeteors)!)
