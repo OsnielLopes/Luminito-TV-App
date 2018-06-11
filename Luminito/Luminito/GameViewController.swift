@@ -61,7 +61,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
     var foreveLabel = SKSpriteNode(imageNamed: "Forever")
     var playButton = MenuButton(imageNamed: "Menu Play Button")
-    var storeButton = MenuButton(imageNamed: "Store Button")
     var buttons = [MenuButton]()
     var currentPowerUp: SKSpriteNode?
     
@@ -188,12 +187,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             buttons.append(playButton)
             self.scene.addChild(playButton)
             
-            storeButton.name = "Store Button"
-            storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.25)
-            storeButton.size = CGSize(width: 140.0, height: 65.0)
-            storeButton.isUserInteractionEnabled = true
-            buttons.append(storeButton)
-            self.scene.addChild(storeButton)
             
             self.currentPowerUp = SKSpriteNode()
             currentPowerUp?.zPosition = 300
@@ -201,7 +194,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             currentPowerUp?.alpha = 0.8
             currentPowerUp?.position = CGPoint(x: self.scene.size.width * 0.95, y: self.scene.size.height * 0.05)
             self.scene.addChild(currentPowerUp!)
-            
+
             //adds the luminito node
             luminito.name = "Luminito"
             let position = CGPoint(x: -(scene?.size.width)!/1.4, y: 0.0)
@@ -476,7 +469,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             self.scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
                 if closerMeteor == nil {
                     closerMeteor = node
-                } else if node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!{
+                } else if (node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!){
                     closerMeteor = node
                 }
             }
@@ -676,6 +669,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         self.gameover = true
         
+        self.energy = 0
+        
         for meteor in self.meteors {
             meteor.physicsBody?.velocity = CGVector(dx: meteor.initialVelocity * -10, dy: 0)
         }
@@ -766,8 +761,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 view.addGestureRecognizer(tapRecognizer)
                 
                 playing = true
-            }else{
-                print("Store selected")
             }
         }
         
