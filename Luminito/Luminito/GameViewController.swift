@@ -72,9 +72,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     let powerUpCategory: UInt32 = 0x1 << 4
     var timer = Timer()
     
-    var second = 0
-    var velocity = CGFloat(1)
-    
     var gameover = false
     var playing = true
     var luminitoInteraction = true
@@ -84,6 +81,12 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var randomGen = RandomGenerator()
     var parallaxManager = ParallaxManager()
     var planetsArray: [Planets] = []
+    
+    //Difficulty Variables
+    var qtdeMeteors = 5
+    var second = 0
+    var velocity = CGFloat(1)
+    var powerUpTime = 0
 
     
     //MARK: - Managers
@@ -200,7 +203,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             luminitoPhysicsBody.isDynamic = false
             luminito.physicsBody = luminitoPhysicsBody
             self.scene.addChild(luminito)
-            
+
+            //Menu
             let menu = Menu(gameScene: self.scene)
             menu.moveMenuToCenter(gameScene: self.scene)
             
@@ -211,10 +215,10 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 })
             })
             
-            //addSelectRecognizer()
-            //addMenuRecognizer()
+            addSelectRecognizer()
+            addMenuRecognizer()
             
-            addMeteors()
+            addMeteors(qtde: self.qtdeMeteors)
             addElectron()
             
             //add HUD
@@ -234,7 +238,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         // Release any cached data, images, etc that aren't in use.
     }
     
-    var powerUpTime = 0
     //MARK: - SKSceneDelegate
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         
@@ -291,7 +294,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         
         } else {
             //GameOver, return distance, there's some frames lost, so we have to increase distance amount per frame
-            //distance += 35000
+            distance += 35000
         }
             
             scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
@@ -333,7 +336,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     //MARK: - ContactDelegate
     
     func didBegin(_ contact: SKPhysicsContact) {
-        
+
         //Luminito
         let whoTouch = contact.bodyA
         
@@ -346,30 +349,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             switch whoTouch.categoryBitMask {
             case luminitoCategory:
                 //Luminito touched meteor and dies tragically
-                
                 self.gameOver()
-//
-//                for meteor in self.meteors {
-//                    meteor.physicsBody = nil
-//                }
-//
-//                whoTouch.categoryBitMask = intangibleLuminitoCategory
-//                let a1 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-//                let a2 = SKAction.moveBy(x: (whoTouch.node?.frame.width)! * 0.05, y: 0, duration: 0.08)
-//                let a3 = SKAction.moveBy(x: -(whoTouch.node?.frame.width)! * 0.025, y: 0, duration: 0.04)
-//
-//                let a4 = SKAction.moveBy(x: 0, y: -self.scene.size.height, duration: 0.5)
-//
-//                let seq = [a1,a2,a3]
-//                whoTouch.node?.run(SKAction.repeat(SKAction.sequence(seq), count: 4), completion: {
-//
-//                    whoTouch.node?.run(a4, completion: {
-//                        self.gameOver()
-//                    })
-//                })
-                
-                
-                
                 break
             default:
                 break
@@ -384,9 +364,21 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             guard let i = powerUpsNames.index(of: (wasTouched.node?.name)!) else {return}
             self.colectible = powerUps[i]
             
-            wasTouched.node?.removeFromParent()
+            wasTouched.node?.removeAllActions()
+            
+            
+            let act1 = SKAction.scale(to: 1.5, duration: 1)
+            let act2 = SKAction.scale(to: 0, duration: 0.3)
+            let seq = SKAction.sequence([act1,act2])
+            
+            wasTouched.node?.run(seq, completion: {
+                wasTouched.node?.removeFromParent()
+            })
+            
+            wasTouched.node?.physicsBody = nil
             
         }
+        
         
     }
     
@@ -423,11 +415,20 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             case .meteorRepellent:
                 print("not allowed yet")
             case .meteorDestroyer:
-                print("not allowed yet")
+                
+                self.powerUpGenerator?.activateMeteorDestroyerPowerUp()
+                print("Destroyer Engaged")
+                
             case .magnet:
+                
+                self.powerUpGenerator?.activateMagnetPowerUp()
                 print("not allowed yet")
+                
             case .oneMoreLife:
+                
+                self.powerUpGenerator?.activateOneMoreLifePowerUp()
                 print("not allowed yet")
+                
             case .none:
                 print("powerUps disabled")
             }
@@ -442,7 +443,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     }
     
     //MARK: - Auxiliar Functions
-    private func addMeteors() {
+    public func addMeteors(qtde: Int) {
         for _ in 0..<5{
             addMeteor()
         }
@@ -458,7 +459,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         meteor.position = meteorPosition
         let meteorPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "Asteroide Pequeno"), size: meteor.size)
         meteorPhysicsBody.categoryBitMask = meteorCategory
-        meteorPhysicsBody.collisionBitMask = luminitoCategory | meteorCategory
+        meteorPhysicsBody.collisionBitMask = luminitoCategory //| meteorCategory
         meteorPhysicsBody.contactTestBitMask = luminitoCategory
         
         meteorPhysicsBody.isDynamic = true
@@ -508,6 +509,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         //Add movement and physics
         let powerUp = SKSpriteNode(imageNamed: (tuple?.name)!)
         powerUp.name = tuple?.name
+        powerUp.zPosition = 300
         powerUp.size = CGSize(width: powerUp.size.width * 0.4, height: powerUp.size.height * 0.4)
         let y = self.randomGen.generateRandomNumber(min: 0, max: Int(self.scene.frame.height))
         powerUp.position = CGPoint(x: Int(self.scene.frame.width), y: y)
@@ -520,9 +522,11 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         powerUpPhysicsBody.isDynamic = true
         
         powerUp.physicsBody = powerUpPhysicsBody
-
+        
         self.scene.addChild(powerUp)
-        powerUp.run(action)
+        powerUp.run(action) {
+            powerUp.removeFromParent()
+        }
     }
    
     
@@ -552,23 +556,23 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     }
     
     func fillPlanetsArray() {
-        let mercury = Planets(name: "Mercurio 2", distance: PlanetDistances.mercury, size: 50)
+        let mercury = Planets(name: "Mercurio 2", distance: PlanetDistances.mercury, size: 80)
         self.planetsArray.append(mercury)
-        let venus = Planets(name: "Venus 2", distance: PlanetDistances.venus, size: 90)
+        let venus = Planets(name: "Venus 2", distance: PlanetDistances.venus, size: 120)
         self.planetsArray.append(venus)
-        let earth = Planets(name: "Terra 2", distance: PlanetDistances.earth, size: 100)
+        let earth = Planets(name: "Terra 2", distance: PlanetDistances.earth, size: 120)
         self.planetsArray.append(earth)
-        let mars = Planets(name: "Marte 2", distance: PlanetDistances.mars, size: 80)
+        let mars = Planets(name: "Marte 2", distance: PlanetDistances.mars, size: 100)
         self.planetsArray.append(mars)
         let jupiter = Planets(name: "Jupiter 2", distance: PlanetDistances.jupiter, size: 200)
         self.planetsArray.append(jupiter)
         let saturn = Planets(name: "Saturno 2", distance: PlanetDistances.saturn, size: 180)
         self.planetsArray.append(saturn)
-        let uranus = Planets(name: "Urano 2", distance: PlanetDistances.uranus, size: 150)
+        let uranus = Planets(name: "Urano 2", distance: PlanetDistances.uranus, size: 160)
         self.planetsArray.append(uranus)
-        let neptune = Planets(name: "Netuno 2", distance: PlanetDistances.neptune, size: 140)
+        let neptune = Planets(name: "Netuno 2", distance: PlanetDistances.neptune, size: 150)
         self.planetsArray.append(neptune)
-        let pluto = Planets(name: "Plutao 2", distance: PlanetDistances.pluto, size: 40)
+        let pluto = Planets(name: "Plutao 2", distance: PlanetDistances.pluto, size: 70)
         self.planetsArray.append(pluto)
     }
     
@@ -643,7 +647,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         self.gameover = false
         self.velocity /= -10
         
-        self.luminito.run(SKAction.wait(forDuration: 5), completion: {
+        self.luminito.run(SKAction.wait(forDuration: 3), completion: {
             self.luminito.physicsBody?.categoryBitMask = self.luminitoCategory
         })
     
