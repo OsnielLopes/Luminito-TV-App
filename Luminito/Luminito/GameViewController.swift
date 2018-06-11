@@ -110,7 +110,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
         return label
     }()
     
-    var distance: Int = 6000000000 {
+    var distance: Int = UserDefaults.standard.integer(forKey: "distance") != 0 ? UserDefaults.standard.integer(forKey: "distance") : 6000000000 {
         didSet {
             self.distanceLabel.text = "\(distance) km"
         }
@@ -194,7 +194,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             currentPowerUp?.alpha = 0.8
             currentPowerUp?.position = CGPoint(x: self.scene.size.width * 0.95, y: self.scene.size.height * 0.05)
             self.scene.addChild(currentPowerUp!)
-
+            
             //adds the luminito node
             luminito.name = "Luminito"
             let position = CGPoint(x: -(scene?.size.width)!/1.4, y: self.scene.size.height/2)
@@ -272,12 +272,9 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 //A second passed, 300.000 km traveled
                 
                 //INCREASE DIFFICULTY
-    
+                
                 //1,5 in velocity each 5 minutes
                 self.velocity += 0.005
-                
-                
-                
                 second += 1
                 powerUpTime += 1
                 
@@ -362,7 +359,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 electron.physicsBody?.velocity = CGVector(dx: -100, dy: 0)
             }
         }
-        //}
+        
+        UserDefaults.standard.set(distance, forKey: "distance")
     }
     
     //MARK: - ContactDelegate
@@ -392,7 +390,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             //Something touched PowerUp
             guard let n = wasTouched.node as! SKSpriteNode? else {return}
-            
             
             guard let powerUpsNames = self.powerUpGenerator?.powerUpNames else {return}
             guard let powerUps = self.powerUpGenerator?.powerUps else {return}
@@ -474,27 +471,36 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     @objc func didSwipe() {
         if energy == 100 {
             energy = 0
+            //finds the closer meteor
             var closerMeteor: SKNode?
-            self.scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
-                if closerMeteor == nil {
-                    closerMeteor = node
-                } else if (node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!){
-                    closerMeteor = node
+            var rangeOfSearch: CGFloat = 0.5
+            repeat {
+                self.scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
+                    if node.position.x > self.luminito.position.x && node.position.y > self.luminito.position.y - self.scene.size.height * rangeOfSearch && node.position.y < self.luminito.position.y + self.scene.size.height * rangeOfSearch{
+                        if closerMeteor == nil {
+                            closerMeteor = node
+                        } else if (node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!){
+                            closerMeteor = node
+                        }
+                    }
                 }
-            }
+                rangeOfSearch += 0.5
+            } while(closerMeteor == nil)
             
+            
+            //creates a shot and an action
             let shot = SKSpriteNode(imageNamed: "electron")
             shot.size = CGSize(width: shot.size.width*0.1, height: shot.size.height*0.1)
             shot.position = luminito.position
             self.scene.addChild(shot)
-            let action = SKAction.move(to: (closerMeteor?.position)!, duration: 1)
+            var closerMeteorPosition = closerMeteor!.position
+            closerMeteorPosition.x -= 100
+            let action = SKAction.move(to: closerMeteorPosition, duration: TimeInterval(self.luminito.position.distance(to: closerMeteorPosition)/600))
             shot.run(action) {
                 shot.removeFromParent()
                 closerMeteor?.removeFromParent()
                 self.addMeteor()
             }
-            
-            
         }
     }
     
@@ -550,8 +556,8 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             
             let electronPhysicsBody = SKPhysicsBody(texture: SKTexture(imageNamed: "electron"), size: electron.size)
             electronPhysicsBody.categoryBitMask = electronCategory
-            electronPhysicsBody.collisionBitMask = luminitoCategory
-            electronPhysicsBody.contactTestBitMask = luminitoCategory
+            electronPhysicsBody.collisionBitMask = luminitoCategory | intangibleLuminitoCategory
+            electronPhysicsBody.contactTestBitMask = luminitoCategory | intangibleLuminitoCategory
             electronPhysicsBody.isDynamic = true
             electronPhysicsBody.linearDamping = 0
             electronPhysicsBody.velocity = CGVector(dx: -100, dy: 0)
@@ -605,7 +611,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             size = CGSize(width: 60, height: 60)
         }else{
             texture = SKTexture(imageNamed: "Asteroide Pequeno")
-            size = CGSize(width: 40, height: 40)
+            size = CGSize(width: 50, height: 50)
         }
         
         let meteor = SKMeteorNode(texture: texture!, initialVelocity: xVelocity, size: size!)
