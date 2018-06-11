@@ -61,7 +61,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
     var luminitoLabel = SKSpriteNode(imageNamed: "Titulo_inicial")
     var foreveLabel = SKSpriteNode(imageNamed: "Forever")
     var playButton = MenuButton(imageNamed: "Menu Play Button")
-    var storeButton = MenuButton(imageNamed: "Store Button")
     var buttons = [MenuButton]()
     
     var colectible: Colectible = .intangibility
@@ -186,13 +185,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             playButton.isUserInteractionEnabled = true
             buttons.append(playButton)
             self.scene.addChild(playButton)
-            
-            storeButton.name = "Store Button"
-            storeButton.position = CGPoint(x: (scene?.frame.size.width)!, y: (scene?.frame.size.height)! * 0.25)
-            storeButton.size = CGSize(width: 140.0, height: 65.0)
-            storeButton.isUserInteractionEnabled = true
-            buttons.append(storeButton)
-            self.scene.addChild(storeButton)
             
             //adds the luminito node
             luminito.name = "Luminito"
@@ -446,7 +438,7 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
             self.scene.enumerateChildNodes(withName: "meteor") { (node, stop) in
                 if closerMeteor == nil {
                     closerMeteor = node
-                } else if node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!{
+                } else if (node.position.distance(to: self.luminito.position) < (closerMeteor?.position.distance(to: self.luminito.position))!){
                     closerMeteor = node
                 }
             }
@@ -736,8 +728,6 @@ class GameViewController: UIViewController, SKSceneDelegate, SKPhysicsContactDel
                 view.addGestureRecognizer(tapRecognizer)
                 
                 playing = true
-            }else{
-                print("Store selected")
             }
         }
         
